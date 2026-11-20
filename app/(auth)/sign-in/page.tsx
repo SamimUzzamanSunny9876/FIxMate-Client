@@ -99,7 +99,10 @@ export default function SignInPage({
       const userRole: UserRole = "customer"; // Replace with role from BetterAuth response
 
       toast.success("Signed in successfully! Welcome back.");
-      router.push(safeCallbackUrl || getDashboardRoute(userRole));
+      router.push(
+        '/'
+        // safeCallbackUrl || getDashboardRoute(userRole)
+        );
       router.refresh();
     } catch {
       toast.error("Invalid credentials or server error. Please try again.");
