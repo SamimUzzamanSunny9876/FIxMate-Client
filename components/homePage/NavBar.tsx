@@ -18,10 +18,10 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { label: "Home", href: "#home" },
-  { label: "Services", href: "#services" },
-  { label: "How It Works", href: "#how-it-works" },
-  { label: "About", href: "#about" },
+  { label: "Home", href: "/" },
+  { label: "Services", href: "/services" },
+  { label: "How It Works", href: "/how-it-works" },
+  { label: "About", href: "/about" },
 ];
 
 export function NavBar() {
@@ -76,15 +76,19 @@ export function NavBar() {
 
         {/* Desktop Auth Actions */}
         <div className="hidden md:flex items-center gap-3">
+          <Link href={'/sign-in'}> 
           <Button
             variant="ghost"
             className="text-sm font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 rounded-full px-4 transition-colors"
           >
             Sign In
           </Button>
+          </Link>
+            <Link href={'/sign-up'}> 
           <Button className="rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-6 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all duration-300 hover:shadow-lg hover:shadow-indigo-500/40 hover:-translate-y-0.5 active:translate-y-0">
             Sign Up
           </Button>
+          </Link>
         </div>
 
         {/* Mobile Menu Trigger */}
