@@ -6,9 +6,18 @@ const client = new MongoClient(process.env.BETTER_AUTH_DB_URI as string)
 const db = client.db("FixMatedb")
 
 export const auth = betterAuth({
-   
   emailAndPassword: {
     enabled: true,
+  },
+  user: {
+    additionalFields: {
+      role: {
+        type: ["customer", "technician", "admin"],
+        required: true,
+        defaultValue: "customer",
+        input: true,
+      },
+    },
   },
   socialProviders: {
     google: {
