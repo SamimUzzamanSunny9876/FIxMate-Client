@@ -55,7 +55,7 @@ export default function SignUpPage({
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
-
+  const [image, setImage] = useState("")
   // Live password rule checks
   const hasMinLength = password.length >= 6
   const hasUppercase = /[A-Z]/.test(password)
@@ -87,30 +87,31 @@ export default function SignUpPage({
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = async (e: React.SubmitEvent<HTMLElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!validateForm()) return
 
     setIsLoading(true)
     try {
-       
-        const fromData = new FormData(e.target);
-        const user  = Object.fromEntries(fromData.entries()) as {name:string, email: string, image: string, role:string ,password: string}
-       console.log(user);
       const { data, error } = await authClient.signUp.email({
-       ...user
+        name: name.trim(),
+        email: email.trim(),
+        password,
+        image: image.trim() || undefined,
+        role,
       })
+
       if (error) {
-        toast.error(error.message || "Failed to create account.");
-        return;
+        toast.error(error.message || "Failed to create account.")
+        return
       }
 
+      console.log("Created user:", data)
       toast.success("Account created successfully! Welcome to FixMate.")
-    //   router.push(
-    //     role === "technician" ? "/dashboard/technician" : "/dashboard/customer"
-
-    console.log(data);
-    //   )
+      router.push(
+        '/'
+        // role === "technician" ? "/dashboard/technician" : "/dashboard/customer"
+      )
     } catch {
       toast.error("Something went wrong. Please try again.")
     } finally {
@@ -362,6 +363,26 @@ export default function SignUpPage({
                       {errors.email}
                     </p>
                   )}
+                </Field>
+
+                {/* Profile Image URL (Optional) */}
+                <Field>
+                  <FieldLabel
+                    htmlFor="image"
+                    className="text-sm font-medium text-slate-700"
+                  >
+                    Profile Image URL{" "}
+                    <span className="text-slate-400">(Optional)</span>
+                  </FieldLabel>
+                  <Input
+                    id="image"
+                    name="image"
+                    type="url"
+                    placeholder="https://example.com/avatar.jpg"
+                    value={image}
+                    onChange={(e) => setImage(e.target.value)}
+                    className="h-11 rounded-xl border-slate-200/90 bg-white/90 text-slate-900 transition-all placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/10"
+                  />
                 </Field>
 
                 {/* Password */}
