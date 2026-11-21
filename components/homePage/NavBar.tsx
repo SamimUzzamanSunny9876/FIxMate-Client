@@ -37,12 +37,7 @@ interface NavItem {
   href: string
 }
 
-const navItems: NavItem[] = [
-  { label: "Home", href: "/" },
-  { label: "Services", href: "/services" },
-  { label: "How It Works", href: "/how-it-works" },
-  { label: "About", href: "/about" },
-]
+
 
 export function NavBar() {
   const pathname = usePathname()
@@ -57,6 +52,15 @@ export function NavBar() {
   const userRole = (user as { role?: string } | undefined)?.role
   const dashboardHref =
     userRole === "technician" ? "/dashboard/technician" : "/dashboard/customer"
+
+
+    const navItems: NavItem[] = [
+  { label: "Home", href: "/" },
+  { label: "Services", href: "/services" },
+  { label: "How It Works", href: "/how-it-works" },
+  { label: "About", href: "/about" },
+   { label: "Dashboard", href: `/dashboard/${session?.user.role || 'customer'}` },
+]
 
   const getInitials = (name?: string | null) => {
     if (!name) return "U"
