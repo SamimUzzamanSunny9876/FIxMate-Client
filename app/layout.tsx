@@ -29,10 +29,10 @@ export default function RootLayout({
     >
       <body>
         <ThemeProvider>
-          <NavBar></NavBar>
+        
           {children}
           <Toaster position="top-right" richColors />
-          <Footer/>
+        
           </ThemeProvider>
       </body>
     </html>
