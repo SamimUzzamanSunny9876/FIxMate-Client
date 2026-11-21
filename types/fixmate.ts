@@ -67,6 +67,8 @@ export interface RepairService {
   createdAt: string | Date;
 }
 
+export type CreateServicePayload = Omit<RepairService, "_id" | "createdAt">;
+
 // ==========================================
 // 3. Bookings Collection
 // ==========================================
@@ -119,3 +121,4 @@ export interface Payment {
   paymentStatus: "paid";
   paidAt: string | Date;
 }
+

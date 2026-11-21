@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  UploadCloud,
+  Link2,
   X,
   DollarSign,
   Clock,
@@ -20,7 +20,11 @@ import {
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
-import { ServiceCategory, ServiceMode } from "@/types/fixmate";
+import {
+  ServiceCategory,
+  ServiceMode,
+  CreateServicePayload,
+} from "@/types/fixmate";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -40,6 +44,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { createService } from "@/lib/actions/services";
 
 const SERVICE_CATEGORIES: ServiceCategory[] = [
   "Smartphone",
@@ -61,10 +66,19 @@ interface FormErrors {
   image?: string;
 }
 
+function isValidImageUrl(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 export default function AddServicePage() {
   const router = useRouter();
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-  const { data: session } = authClient.useSession();
+  const { data: session, isPending: isSessionLoading } =
+    authClient.useSession();
 
   const technicianName = session?.user?.name || "";
   const technicianEmail = session?.user?.email || "";
@@ -77,54 +91,12 @@ export default function AddServicePage() {
   const [estimatedDuration, setEstimatedDuration] = useState("");
   const [serviceMode, setServiceMode] = useState<ServiceMode>("Home Visit");
   const [serviceArea, setServiceArea] = useState("");
-
-  // Image upload states
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
+  const [imageUrl, setImageUrl] = useState("");
+  const [imgLoadError, setImgLoadError] = useState(false);
 
   // Submission states
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
-
-  // Clean up object URL to prevent memory leaks
-  useEffect(() => {
-    return () => {
-      if (imagePreview) URL.revokeObjectURL(imagePreview);
-    };
-  }, [imagePreview]);
-
-  const handleImageSelection = (file: File | undefined) => {
-    if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-      setErrors((prev) => ({
-        ...prev,
-        image: "Please select a valid image file (PNG, JPG, WebP).",
-      }));
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      setErrors((prev) => ({
-        ...prev,
-        image: "Image size must be under 5MB.",
-      }));
-      return;
-    }
-
-    if (imagePreview) URL.revokeObjectURL(imagePreview);
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
-    setErrors((prev) => ({ ...prev, image: undefined }));
-  };
-
-  const removeImage = () => {
-    if (imagePreview) URL.revokeObjectURL(imagePreview);
-    setImageFile(null);
-    setImagePreview(null);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -151,38 +123,23 @@ export default function AddServicePage() {
       newErrors.serviceArea =
         'Service area is required (e.g., "Dhanmondi, Dhaka").';
     }
-    if (!imageFile) {
-      newErrors.image = "Please upload a service image.";
+    if (!imageUrl.trim()) {
+      newErrors.image = "Please paste an image URL.";
+    } else if (!isValidImageUrl(imageUrl.trim())) {
+      newErrors.image =
+        "Please enter a valid image URL starting with http:// or https://.";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const uploadToImgBB = async (file: File): Promise<string> => {
-    const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY;
-    if (!apiKey) {
-      throw new Error("Missing NEXT_PUBLIC_IMGBB_API_KEY in .env.local");
-    }
-
-    const formData = new FormData();
-    formData.append("image", file);
-
-    const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
-      method: "POST",
-      body: formData,
-    });
-
-    const data = await res.json();
-    if (!res.ok || !data?.success) {
-      throw new Error(data?.error?.message || "Image upload to ImgBB failed.");
-    }
-
-    return data.data.display_url as string;
-  };
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (!technicianEmail) {
+      toast.error("Session is still loading. Please try again in a moment.");
+      return;
+    }
     if (!validateForm()) {
       toast.error("Please fix the highlighted errors before submitting.");
       return;
@@ -190,15 +147,11 @@ export default function AddServicePage() {
 
     setIsSubmitting(true);
     try {
-      // 1. Upload image file to ImgBB
-      const uploadedImageUrl = await uploadToImgBB(imageFile as File);
-
-      // 2. Send service payload to Express backend
-      const payload = {
+      const payload: CreateServicePayload = {
         title: title.trim(),
-        category,
+        category: category as ServiceCategory,
         description: description.trim(),
-        image: uploadedImageUrl,
+        image: imageUrl.trim(),
         basePrice: Number(basePrice),
         estimatedDuration: estimatedDuration.trim(),
         serviceMode,
@@ -209,24 +162,9 @@ export default function AddServicePage() {
         isAvailable: true,
       };
 
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
-      const response = await fetch(`${apiUrl}/api/services`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
+      const result = await createService(payload);
 
-      const result = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(result?.message || "Failed to publish service.");
-      }
-
-      toast.success(
-        "Service submitted! It is now waiting for admin approval."
-      );
+      toast.success("Service submitted! It is now waiting for admin approval.");
       router.push("/dashboard/technician/my-services");
       router.refresh();
     } catch (err) {
@@ -239,6 +177,11 @@ export default function AddServicePage() {
       setIsSubmitting(false);
     }
   };
+
+  const showPreviewImage =
+    Boolean(imageUrl.trim()) &&
+    isValidImageUrl(imageUrl.trim()) &&
+    !imgLoadError;
 
   return (
     <div className="relative mx-auto w-full max-w-6xl space-y-6 px-4 py-6 sm:px-6 lg:px-8">
@@ -295,7 +238,8 @@ export default function AddServicePage() {
                     }}
                     className={cn(
                       "h-11 rounded-xl border-slate-200/90 bg-white transition-all focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/10 dark:border-slate-800 dark:bg-slate-900",
-                      errors.title && "border-red-400 focus-visible:ring-red-500/10"
+                      errors.title &&
+                        "border-red-400 focus-visible:ring-red-500/10"
                     )}
                   />
                   {errors.title && (
@@ -538,83 +482,52 @@ export default function AddServicePage() {
                 </div>
               </div>
 
-              {/* Row 5: Service Banner Image Upload (ImgBB File Input) */}
+              {/* Row 5: Service Banner Image URL */}
               <div className="space-y-2">
-                <Label className="text-sm font-medium text-slate-700 dark:text-slate-200">
-                  Service Banner Image <span className="text-red-500">*</span>
+                <Label
+                  htmlFor="imageUrl"
+                  className="text-sm font-medium text-slate-700 dark:text-slate-200"
+                >
+                  Service Banner Image URL{" "}
+                  <span className="text-red-500">*</span>
                 </Label>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  className="hidden"
-                  onChange={(e) => handleImageSelection(e.target.files?.[0])}
-                />
-
-                {!imagePreview ? (
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={() => fileInputRef.current?.click()}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        fileInputRef.current?.click();
-                      }
-                    }}
-                    onDragOver={(e) => {
-                      e.preventDefault();
-                      setIsDragging(true);
-                    }}
-                    onDragLeave={() => setIsDragging(false)}
-                    onDrop={(e) => {
-                      e.preventDefault();
-                      setIsDragging(false);
-                      handleImageSelection(e.dataTransfer.files?.[0]);
+                <div className="relative">
+                  <Link2 className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <Input
+                    id="imageUrl"
+                    type="url"
+                    placeholder="https://example.com/repair-service.jpg"
+                    value={imageUrl}
+                    onChange={(e) => {
+                      setImageUrl(e.target.value);
+                      setImgLoadError(false);
+                      if (errors.image)
+                        setErrors({ ...errors, image: undefined });
                     }}
                     className={cn(
-                      "group flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-8 text-center transition-all duration-300",
-                      isDragging
-                        ? "border-indigo-500 bg-indigo-50/70 scale-[1.01] dark:bg-indigo-950/40"
-                        : "border-slate-200 bg-slate-50/60 hover:border-indigo-400 hover:bg-indigo-50/30 dark:border-slate-800 dark:bg-slate-900/40 dark:hover:border-indigo-700",
-                      errors.image && "border-red-400 bg-red-50/30"
+                      "h-11 rounded-xl border-slate-200/90 bg-white pl-9 pr-10 transition-all focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/10 dark:border-slate-800 dark:bg-slate-900",
+                      errors.image &&
+                        "border-red-400 focus-visible:ring-red-500/10"
                     )}
-                  >
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-100/80 text-indigo-600 transition-transform duration-300 group-hover:scale-110 group-hover:-translate-y-0.5 dark:bg-indigo-950 dark:text-indigo-400">
-                      <UploadCloud className="h-6 w-6" />
-                    </div>
-                    <p className="mt-3 text-sm font-semibold text-slate-800 dark:text-slate-200">
-                      Click to upload or drag & drop
-                    </p>
-                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                      PNG, JPG, or WebP (max 5MB) • Uploaded securely via ImgBB
-                    </p>
-                  </div>
-                ) : (
-                  <div className="relative overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-100 dark:border-slate-800 dark:bg-slate-900 animate-in fade-in zoom-in-95 duration-300">
-                    <img
-                      src={imagePreview}
-                      alt="Selected service preview"
-                      className="h-52 w-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-slate-900/50 via-transparent to-transparent" />
-                    <div className="absolute right-3 bottom-3 left-3 flex items-center justify-between gap-2">
-                      <span className="truncate rounded-full bg-black/55 px-3 py-1 text-xs font-medium text-white backdrop-blur-md">
-                        {imageFile?.name}
-                      </span>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="destructive"
-                        onClick={removeImage}
-                        className="h-8 rounded-full px-3 text-xs shadow-md"
-                      >
-                        <X className="mr-1 h-3.5 w-3.5" />
-                        Remove
-                      </Button>
-                    </div>
-                  </div>
-                )}
-
+                  />
+                  {imageUrl && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setImageUrl("");
+                        setImgLoadError(false);
+                      }}
+                      aria-label="Clear image URL"
+                      className="absolute top-1/2 right-3 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600 dark:hover:text-slate-200"
+                    >
+                      <X className="h-4 w-4" />
+                    </button>
+                  )}
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Right-click any web image, choose &ldquo;Copy image
+                  address&rdquo;, and paste it here.
+                </p>
                 {errors.image && (
                   <p className="text-xs font-medium text-red-500 animate-in fade-in slide-in-from-top-1 duration-200">
                     {errors.image}
@@ -669,19 +582,19 @@ export default function AddServicePage() {
                   variant="outline"
                   disabled={isSubmitting}
                   onClick={() => router.back()}
-                  className="h-11 rounded-full px-6 border-slate-200 dark:border-slate-800"
+                  className="h-11 rounded-full border-slate-200 px-6 dark:border-slate-800"
                 >
                   Cancel
                 </Button>
                 <Button
                   type="submit"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || isSessionLoading}
                   className="h-11 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-8 text-sm font-semibold text-white shadow-md shadow-indigo-500/25 transition-all duration-300 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-indigo-500/40 hover:brightness-105 active:translate-y-0 disabled:opacity-60"
                 >
                   {isSubmitting ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Uploading & Submitting...
+                      Submitting...
                     </>
                   ) : (
                     <>
@@ -712,16 +625,21 @@ export default function AddServicePage() {
           <Card className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white shadow-lg transition-all duration-300 hover:shadow-xl dark:border-slate-800 dark:bg-slate-950">
             {/* Preview Image */}
             <div className="relative h-44 w-full bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-900">
-              {imagePreview ? (
+              {showPreviewImage ? (
                 <img
-                  src={imagePreview}
+                  src={imageUrl.trim()}
                   alt="Service card preview"
+                  onError={() => setImgLoadError(true)}
                   className="h-full w-full object-cover"
                 />
               ) : (
                 <div className="flex h-full flex-col items-center justify-center gap-2 text-slate-400">
                   <ImageIcon className="h-8 w-8 opacity-60" />
-                  <span className="text-xs">Banner preview</span>
+                  <span className="text-xs">
+                    {imgLoadError
+                      ? "Could not load image URL"
+                      : "Paste an image URL to preview"}
+                  </span>
                 </div>
               )}
               <Badge className="absolute top-3 left-3 rounded-full bg-white/90 text-xs font-semibold text-slate-800 shadow-xs backdrop-blur-md hover:bg-white dark:bg-slate-900/90 dark:text-slate-100">
