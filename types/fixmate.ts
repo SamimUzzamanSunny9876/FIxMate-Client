@@ -79,7 +79,7 @@ export interface StatusHistoryEntry {
 }
 
 export interface Booking {
-  _id: string;
+  _id?: string;
   serviceId: string;
   serviceTitle: string;
   serviceImage: string;

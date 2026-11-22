@@ -1,44 +1,44 @@
-"use client";
+"use client"
 
-import React, { useState } from "react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Wrench, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react";
-import { toast } from "sonner";
-import { cn } from "@/lib/utils";
-import { UserRole } from "@/types/fixmate";
-import { Button } from "@/components/ui/button";
+import React, { useState } from "react"
+import Link from "next/link"
+import { useRouter, useSearchParams } from "next/navigation"
+import { Wrench, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react"
+import { toast } from "sonner"
+import { cn } from "@/lib/utils"
+import { UserRole } from "@/types/fixmate"
+import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from "@/components/ui/card"
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
   FieldSeparator,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { authClient } from "@/lib/auth-client";
+} from "@/components/ui/field"
+import { Input } from "@/components/ui/input"
+import { authClient } from "@/lib/auth-client"
 
 interface FormErrors {
-  email?: string;
-  password?: string;
+  email?: string
+  password?: string
 }
 
 function getDashboardRoute(role?: UserRole): string {
   switch (role) {
     case "admin":
-      return "/dashboard/admin";
+      return "/dashboard/admin"
     case "technician":
-      return "/dashboard/technician";
+      return "/dashboard/technician"
     case "customer":
     default:
-      return "/dashboard/customer";
+      return "/dashboard/customer"
   }
 }
 
@@ -46,85 +46,100 @@ export default function SignInPage({
   className,
   ...props
 }: React.ComponentProps<"div">) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  const router = useRouter()
+  const searchParams = useSearchParams()
 
-  // Supports redirecting back to a protected page or service details page
-  const rawCallback =
-    searchParams.get("callbackUrl") || searchParams.get("redirect");
-  const safeCallbackUrl =
-    rawCallback && rawCallback.startsWith("/") ? rawCallback : null;
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<FormErrors>({});
+    // Supports redirecting back to a protected page or service details page
+ const rawCallback =
+  searchParams.get("redirectTo") ||
+  searchParams.get("callbackUrl") ||
+  searchParams.get("redirect")
+
+
+
+const safeCallbackUrl =
+  rawCallback && rawCallback.startsWith("/") ? rawCallback : null
+
+  
+
+
+ 
+
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [errors, setErrors] = useState<FormErrors>({})
+
+
+ 
 
   const validateForm = (): boolean => {
-    const newErrors: FormErrors = {};
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const newErrors: FormErrors = {}
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
     if (!email.trim()) {
-      newErrors.email = "Email address is required.";
+      newErrors.email = "Email address is required."
     } else if (!emailRegex.test(email)) {
-      newErrors.email = "Please enter a valid email address.";
+      newErrors.email = "Please enter a valid email address."
     }
 
     if (!password) {
-      newErrors.password = "Password is required.";
+      newErrors.password = "Password is required."
     }
 
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
+    setErrors(newErrors)
+    return Object.keys(newErrors).length === 0
+  }
+
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!validateForm()) return;
+    e.preventDefault()
+    if (!validateForm()) return
 
-    setIsLoading(true);
+    setIsLoading(true)
     try {
       // Replace with your BetterAuth client call:
+     
       const { data, error } = await authClient.signIn.email({
         email,
         password,
-      });
+     
+      })
+
       if (error) {
-        toast.error(error.message || "Invalid email or password.");
-        return;
+        toast.error(error.message || "Invalid email or password.")
+        return
       }
-      // const userRole = (data?.user as { role?: UserRole })?.role;
 
-      const userRole: UserRole = "customer"; // Replace with role from BetterAuth response
+      const userRole = (data?.user as { role?: UserRole })?.role
+      const targetUrl = safeCallbackUrl || getDashboardRoute(userRole)
 
-      toast.success("Signed in successfully! Welcome back.");
-      router.push(
-        '/'
-        // safeCallbackUrl || getDashboardRoute(userRole)
-        );
-      router.refresh();
+      toast.success("Signed in successfully! Welcome back.")
+      router.replace(targetUrl)
+      router.refresh()
     } catch {
-      toast.error("Invalid credentials or server error. Please try again.");
+      toast.error("Invalid credentials or server error. Please try again.")
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   const handleGoogleSignIn = async () => {
-    setIsLoading(true);
+    setIsLoading(true)
     try {
       // Replace with your BetterAuth Google social call:
       // await authClient.signIn.social({
       //   provider: "google",
       //   callbackURL: safeCallbackUrl || "/dashboard/customer",
       // });
-      toast.success("Redirecting to Google...");
+      toast.success("Redirecting to Google...")
     } catch {
-      toast.error("Google sign in failed. Please try again.");
-      setIsLoading(false);
+      toast.error("Google sign in failed. Please try again.")
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <div
@@ -143,7 +158,7 @@ export default function SignInPage({
         <div className="absolute -bottom-32 -left-20 h-[420px] w-[420px] rounded-full bg-gradient-to-tr from-violet-200/40 via-indigo-100/30 to-sky-100/40 blur-3xl" />
       </div>
 
-      <div className="w-full max-w-md space-y-6 animate-in fade-in slide-in-from-bottom-6 duration-700">
+      <div className="w-full max-w-md animate-in space-y-6 duration-700 fade-in slide-in-from-bottom-6">
         {/* Brand Header */}
         <div className="flex flex-col items-center text-center">
           <Link
@@ -196,7 +211,7 @@ export default function SignInPage({
                   </Button>
                 </Field>
 
-                <FieldSeparator className="*:data-[slot=field-separator-content]:bg-white/90 text-xs text-slate-400">
+                <FieldSeparator className="text-xs text-slate-400 *:data-[slot=field-separator-content]:bg-white/90">
                   Or sign in with email
                 </FieldSeparator>
 
@@ -216,19 +231,19 @@ export default function SignInPage({
                     placeholder="you@example.com"
                     value={email}
                     onChange={(e) => {
-                      setEmail(e.target.value);
+                      setEmail(e.target.value)
                       if (errors.email)
-                        setErrors({ ...errors, email: undefined });
+                        setErrors({ ...errors, email: undefined })
                     }}
                     className={cn(
-                      "h-11 rounded-xl border-slate-200/90 bg-white/90 text-slate-900 placeholder:text-slate-400 transition-all focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/10",
+                      "h-11 rounded-xl border-slate-200/90 bg-white/90 text-slate-900 transition-all placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/10",
                       errors.email &&
                         "border-red-400 focus-visible:border-red-500 focus-visible:ring-red-500/10"
                     )}
                     required
                   />
                   {errors.email && (
-                    <p className="mt-1 text-xs font-medium text-red-500 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <p className="mt-1 animate-in text-xs font-medium text-red-500 duration-200 fade-in slide-in-from-top-1">
                       {errors.email}
                     </p>
                   )}
@@ -253,12 +268,12 @@ export default function SignInPage({
                       placeholder="Enter your password"
                       value={password}
                       onChange={(e) => {
-                        setPassword(e.target.value);
+                        setPassword(e.target.value)
                         if (errors.password)
-                          setErrors({ ...errors, password: undefined });
+                          setErrors({ ...errors, password: undefined })
                       }}
                       className={cn(
-                        "h-11 rounded-xl border-slate-200/90 bg-white/90 pr-10 text-slate-900 placeholder:text-slate-400 transition-all focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/10",
+                        "h-11 rounded-xl border-slate-200/90 bg-white/90 pr-10 text-slate-900 transition-all placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/10",
                         errors.password &&
                           "border-red-400 focus-visible:border-red-500 focus-visible:ring-red-500/10"
                       )}
@@ -280,7 +295,7 @@ export default function SignInPage({
                     </button>
                   </div>
                   {errors.password && (
-                    <p className="mt-1 text-xs font-medium text-red-500 animate-in fade-in slide-in-from-top-1 duration-200">
+                    <p className="mt-1 animate-in text-xs font-medium text-red-500 duration-200 fade-in slide-in-from-top-1">
                       {errors.password}
                     </p>
                   )}
@@ -307,7 +322,7 @@ export default function SignInPage({
                     Don&apos;t have an account?{" "}
                     <Link
                       href="/sign-up"
-                      className="font-semibold text-indigo-600 transition-colors hover:text-indigo-700 hover:underline underline-offset-4"
+                      className="font-semibold text-indigo-600 underline-offset-4 transition-colors hover:text-indigo-700 hover:underline"
                     >
                       Sign Up
                     </Link>
@@ -325,5 +340,5 @@ export default function SignInPage({
         </div>
       </div>
     </div>
-  );
+  )
 }

@@ -30,6 +30,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { customerBookingService } from "@/lib/actions/services";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
@@ -56,7 +57,7 @@ export function RequestRepairModal({ service }: RequestRepairModalProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [bookingSuccess, setBookingSuccess] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [today, setToday] = useState("");
+  const[today, setToday] = useState('')
 
   // Today's local date in YYYY-MM-DD format for date input min attribute
  
@@ -105,7 +106,7 @@ export function RequestRepairModal({ service }: RequestRepairModalProps) {
 
     setIsSubmitting(true);
     try {
-      const payload = {
+      const booking = {
         serviceId: service._id,
         serviceTitle: service.title,
         serviceImage: service.image,
@@ -120,23 +121,13 @@ export function RequestRepairModal({ service }: RequestRepairModalProps) {
         address: address.trim(),
         preferredDate,
         problemDescription: problemDescription.trim(),
-        status: "requested",
-        paymentStatus: "unpaid",
+        status: "requested" as const,
+        paymentStatus: "unpaid" as const ,
       };
 
-      const res = await fetch(`${BASE_URL}/bookings`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(payload),
-      });
+      const customerBooking = await customerBookingService(booking)
 
-      const result = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        throw new Error(
-          result?.message || "Failed to submit repair request."
-        );
-      }
+     
 
       toast.success("Repair request sent! Track your job in My Bookings.");
       setBookingSuccess(true);

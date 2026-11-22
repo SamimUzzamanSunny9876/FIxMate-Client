@@ -1,4 +1,4 @@
-import { CreateServicePayload, RepairService } from "@/types/fixmate";
+import { Booking, CreateServicePayload, RepairService } from "@/types/fixmate";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
@@ -88,3 +88,23 @@ export const deleteService = async (id: string) => {
   }
   return result;
 };
+
+
+// making customer bookings 
+
+export const customerBookingService= async (data: Booking) => {
+      const booking = await fetch(`${BASE_URL}/bookings`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify(data),
+      });
+
+      const result = await booking.json().catch(() => ({}));
+      if (!booking.ok) {
+        throw new Error(
+          result?.message || "Failed to submit repair request."
+        );
+      }
+
+}
