@@ -42,7 +42,7 @@ interface NavItem {
 export function NavBar() {
   const pathname = usePathname()
   const router = useRouter()
-
+ 
   const [isSheetOpen, setIsSheetOpen] = useState(false)
   const [isAccountOpen, setIsAccountOpen] = useState(false)
   const [isSigningOut, setIsSigningOut] = useState(false)
@@ -52,6 +52,9 @@ export function NavBar() {
   const userRole = (user as { role?: string } | undefined)?.role
   const dashboardHref =
     userRole === "technician" ? "/dashboard/technician" : "/dashboard/customer"
+
+
+     if (pathname.startsWith("/dashboard")) return null;
 
 
     const navItems: NavItem[] = [

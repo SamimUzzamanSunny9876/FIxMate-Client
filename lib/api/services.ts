@@ -15,3 +15,10 @@ export const getBrowseServices = async ({
   if (!res.ok) return [];
   return res.json();
 };
+
+
+export const getServiceDetails = async ({id} :{id: string}) =>{
+  const res = await fetch(`${BASE_URL}/browse-services/${id}`)
+  return res.json()
+
+}

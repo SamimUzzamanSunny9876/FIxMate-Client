@@ -314,7 +314,7 @@ const BrowserServicesPage = async ({
                 </div>
 
                 <Link
-                  href={`/services/${service._id}`}
+                  href={`/browse-services/${service._id}`}
                   className="inline-flex h-9 items-center justify-center rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-4 text-xs font-semibold text-white shadow-sm shadow-indigo-500/20 transition-all duration-200 hover:shadow-md hover:shadow-indigo-500/35"
                 >
                   View Details
