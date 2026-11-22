@@ -223,7 +223,7 @@ export function NavBar() {
                   </Link>
 
                   <Link
-                    href="/profile"
+                    href="/dashboard/profile"
                     onClick={() => setIsAccountOpen(false)}
                     className="group flex items-center justify-between rounded-2xl px-4 py-3 text-sm font-medium text-slate-700 transition-all duration-200 hover:bg-indigo-50/70 hover:text-indigo-700"
                   >

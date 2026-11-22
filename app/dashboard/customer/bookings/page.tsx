@@ -139,7 +139,7 @@ const CustomerBookingPage = () => {
     };
 
     void loadBookings();
-
+  
     return () => {
       isMounted = false;
     };

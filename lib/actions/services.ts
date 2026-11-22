@@ -125,3 +125,43 @@ export const cancelCustomerBooking = async (id: string) => {
   }
   return result;
 };
+
+
+import { User } from "@/types/fixmate";
+
+export type ProfileUpdatePayload = {
+  name: string;
+  image?: string;
+  phone?: string;
+  area?: string;
+  bio?: string;
+};
+
+export const getUserProfile = async (email: string): Promise<User | null> => {
+  const res = await fetch(`${BASE_URL}/user/${encodeURIComponent(email)}`, {
+    method: "GET",
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  if (!res.ok) return null;
+  return res.json();
+};
+
+export const profileUpdate = async (
+  email: string,
+  data: ProfileUpdatePayload
+) => {
+  const res = await fetch(`${BASE_URL}/user/${encodeURIComponent(email)}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(data),
+  });
+
+  const result = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(result?.message || "Failed to update profile.");
+  }
+  return result;
+};
