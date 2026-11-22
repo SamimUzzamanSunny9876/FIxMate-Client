@@ -1,4 +1,4 @@
-import { RepairService } from "@/types/fixmate";
+import { Booking, RepairService } from "@/types/fixmate";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
 
@@ -22,3 +22,24 @@ export const getServiceDetails = async ({id} :{id: string}) =>{
   return res.json()
 
 }
+
+//customer booking api 
+
+export const customerBookings = async (
+  email: string
+): Promise<Booking[]> => {
+  const res = await fetch(
+    `${BASE_URL}/bookings?customerEmail=${encodeURIComponent(email)}`,
+    {
+      method: "GET",
+      credentials: "include",
+      cache: "no-store",
+    }
+  );
+
+  const result = await res.json().catch(() => []);
+  if (!res.ok) {
+    throw new Error(result?.message || "Failed to load your bookings.");
+  }
+  return Array.isArray(result) ? result : (result?.data ?? []);
+};

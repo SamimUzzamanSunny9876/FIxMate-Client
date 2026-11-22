@@ -90,7 +90,7 @@ export const deleteService = async (id: string) => {
 };
 
 
-// making customer bookings 
+// making customer bookings  api 
 
 export const customerBookingService= async (data: Booking) => {
       const booking = await fetch(`${BASE_URL}/bookings`, {
@@ -108,3 +108,20 @@ export const customerBookingService= async (data: Booking) => {
       }
 
 }
+
+//cancel booking by customer 
+
+export const cancelCustomerBooking = async (id: string) => {
+  const res = await fetch(`${BASE_URL}/bookings/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ status: "cancelled" }),
+  });
+
+  const result = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(result?.message || "Failed to cancel booking.");
+  }
+  return result;
+};
