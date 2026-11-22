@@ -56,7 +56,7 @@ export function NavBar() {
 
     const navItems: NavItem[] = [
   { label: "Home", href: "/" },
-  { label: "Services", href: "/services" },
+  { label: "Services", href: "/browse-services" },
   { label: "How It Works", href: "/how-it-works" },
   { label: "About", href: "/about" },
    { label: "Dashboard", href: `/dashboard/${session?.user.role || 'customer'}` },
