@@ -1,4 +1,5 @@
 import { Booking, CreateServicePayload, RepairService } from "@/types/fixmate";
+import { User } from "@/types/fixmate";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
@@ -127,7 +128,6 @@ export const cancelCustomerBooking = async (id: string) => {
 };
 
 
-import { User } from "@/types/fixmate";
 
 export type ProfileUpdatePayload = {
   name: string;
