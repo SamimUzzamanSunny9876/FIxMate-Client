@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { createCheckoutSession, handlePayNow } from "@/lib/api/payments";
 import Link from "next/link";
 import {
   Calendar,
@@ -414,9 +415,7 @@ const CustomerBookingPage = () => {
                                 type="button"
                                 size="sm"
                                 onClick={() =>
-                                  toast.info(
-                                    "Stripe payment checkout coming next!"
-                                  )
+                                   handlePayNow(booking._id)
                                 }
                                 className="h-8 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-3.5 text-xs font-semibold text-white shadow-sm"
                               >

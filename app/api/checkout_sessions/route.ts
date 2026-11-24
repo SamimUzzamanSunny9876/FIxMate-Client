@@ -24,6 +24,9 @@ export async function POST() {
       ],
       mode: 'payment',
       customer_email: userSession?.user?.email,
+      metadata:{
+        userId: userSession?.user?.id as string,
+      },
       success_url: `${origin}/dashboard/customer/payments/success?session_id={CHECKOUT_SESSION_ID}`,
       // Provide a name (for example, hosted_web_0001) to label this Checkout integration and measure its conversion independently
       integration_identifier: 'Fixmate_web_Payment_001',

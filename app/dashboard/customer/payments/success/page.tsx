@@ -11,7 +11,11 @@ export default async function Success({ searchParams }: { searchParams: Promise<
 
   const {
     status,
-    customer_details
+    customer_details,
+    customer_email,
+    payment_intent,
+    payment_status,
+    metadata,
   } = await stripe.checkout.sessions.retrieve(session_id, {
     expand: ['line_items', 'payment_intent']
   })
