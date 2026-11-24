@@ -1,4 +1,4 @@
-import { Booking, BookingStatus, RepairService } from "@/types/fixmate";
+import { ApprovalStatus, Booking, BookingStatus, RepairService } from "@/types/fixmate";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
 
@@ -77,6 +77,40 @@ export const updateBookingStatus = async (
   const result = await res.json().catch(() => ({}));
   if (!res.ok) {
     throw new Error(result?.message || "Failed to update booking status.");
+  }
+  return result;
+};
+
+
+
+export const getAdminServices = async (): Promise<RepairService[]> => {
+  const res = await fetch(`${BASE_URL}/admin/services`, {
+    method: "GET",
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  const result = await res.json().catch(() => []);
+  if (!res.ok) {
+    throw new Error(result?.message || "Failed to load services for review.");
+  }
+  return Array.isArray(result) ? result : (result?.data ?? []);
+};
+
+export const updateServiceApproval = async (
+  id: string,
+  approvalStatus: ApprovalStatus
+) => {
+  const res = await fetch(`${BASE_URL}/admin/services/${id}/approval`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify({ approvalStatus }),
+  });
+
+  const result = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(result?.message || "Failed to update approval status.");
   }
   return result;
 };
