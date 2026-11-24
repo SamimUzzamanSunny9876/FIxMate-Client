@@ -1,4 +1,4 @@
-import { Booking, RepairService } from "@/types/fixmate";
+import { Booking, BookingStatus, RepairService } from "@/types/fixmate";
 
 const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
 
@@ -42,4 +42,41 @@ export const customerBookings = async (
     throw new Error(result?.message || "Failed to load your bookings.");
   }
   return Array.isArray(result) ? result : (result?.data ?? []);
+};
+
+
+
+export const technicianBookings = async (email: string): Promise<Booking[]> => {
+  const res = await fetch(
+    `${BASE_URL}/bookings?technicianEmail=${encodeURIComponent(email)}`,
+    {
+      method: "GET",
+      credentials: "include",
+      cache: "no-store",
+    }
+  );
+
+  const result = await res.json().catch(() => []);
+  if (!res.ok) {
+    throw new Error(result?.message || "Failed to load incoming job requests.");
+  }
+  return Array.isArray(result) ? result : (result?.data ?? []);
+};
+
+export const updateBookingStatus = async (
+  id: string,
+  payload: { status: BookingStatus; finalAmount?: number }
+) => {
+  const res = await fetch(`${BASE_URL}/bookings/${id}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    credentials: "include",
+    body: JSON.stringify(payload),
+  });
+
+  const result = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(result?.message || "Failed to update booking status.");
+  }
+  return result;
 };
