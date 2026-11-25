@@ -1,4 +1,4 @@
-import { Booking, BookingStatus, UserRole } from "@/types/fixmate";
+import { Booking, BookingStatus, Payment, UserRole } from "@/types/fixmate";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
@@ -82,4 +82,19 @@ export const adminDeleteBooking = async (id: string) => {
     throw new Error(result?.message || "Failed to delete booking.");
   }
   return result;
+};
+
+// --- Transactions ---
+export const getAllTransactions = async (): Promise<Payment[]> => {
+  const res = await fetch(`${BASE_URL}/payments`, {
+    method: "GET",
+    credentials: "include",
+    cache: "no-store",
+  });
+
+  const result = await res.json().catch(() => []);
+  if (!res.ok) {
+    throw new Error(result?.message || "Failed to load transactions.");
+  }
+  return Array.isArray(result) ? result : (result?.data ?? []);
 };
