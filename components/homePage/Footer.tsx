@@ -20,7 +20,7 @@ interface QuickLink {
 
 const quickLinks: QuickLink[] = [
   { label: "Home", href: "/" },
-  { label: "Services", href: "/services" },
+  { label: "Services", href: "/browse-services" },
   { label: "About", href: "/about" },
 ];
 
@@ -114,7 +114,7 @@ export function Footer() {
 
             {/* Social Links (featuring new X logo) */}
             <div className="flex items-center gap-3 pt-2">
-              <a
+              <Link
                 href="https://x.com"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -122,8 +122,8 @@ export function Footer() {
                 className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 bg-white text-slate-600 shadow-2xs transition-all duration-300 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-600 hover:text-white hover:shadow-md hover:shadow-indigo-500/20"
               >
                 <XLogoIcon className="h-4 w-4" />
-              </a>
-              <a
+              </Link>
+              <Link
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -131,8 +131,8 @@ export function Footer() {
                 className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 bg-white text-slate-600 shadow-2xs transition-all duration-300 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-600 hover:text-white hover:shadow-md hover:shadow-indigo-500/20"
               >
                 <FacebookIcon className="h-4 w-4" />
-              </a>
-              <a
+              </Link>
+              <Link
                 href="https://linkedin.com"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -140,7 +140,7 @@ export function Footer() {
                 className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 bg-white text-slate-600 shadow-2xs transition-all duration-300 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-600 hover:text-white hover:shadow-md hover:shadow-indigo-500/20"
               >
                 <LinkedInIcon className="h-4 w-4" />
-              </a>
+              </Link>
             </div>
           </div>
 
@@ -173,7 +173,7 @@ export function Footer() {
               {popularCategories.map((category) => (
                 <li key={category}>
                   <Link
-                    href={`/services?category=${encodeURIComponent(category)}`}
+                    href={`/browse-services?category=${encodeURIComponent(category)}`}
                     className="group inline-flex items-center gap-1.5 text-sm text-slate-500 transition-colors duration-200 hover:text-indigo-600"
                   >
                     <span className="h-1.5 w-1.5 rounded-full bg-slate-300 transition-colors duration-200 group-hover:bg-indigo-600" />
@@ -204,7 +204,7 @@ export function Footer() {
                   href="tel:+8801700000000"
                   className="transition-colors hover:text-indigo-600"
                 >
-                  +880 1700-000000
+                  +880 1861805137
                 </a>
               </li>
               <li className="flex items-center gap-3">
