@@ -1,60 +1,42 @@
 import { Payment } from "@/types/fixmate";
 import { toast } from "sonner";
+import { protectedMutation, protectedQuery } from "../core/server";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
-export const getCustomerPayments = async (email: string): Promise<Payment[]> => {
-  const res = await fetch(
-    `${BASE_URL}/payments?customerEmail=${encodeURIComponent(email)}`,
-    {
-      method: "GET",
-      credentials: "include",
-      cache: "no-store",
-    }
+export const getCustomerPayments = async (
+  email: string
+): Promise<Payment[]> => {
+  const result = await protectedQuery<Payment[] | { data?: Payment[] }>(
+    `${BASE_URL}/payments?customerEmail=${encodeURIComponent(email)}`
   );
-
-  const result = await res.json().catch(() => []);
-  if (!res.ok) {
-    throw new Error(result?.message || "Failed to load payment history.");
-  }
   return Array.isArray(result) ? result : (result?.data ?? []);
 };
 
 export const createCheckoutSession = async (
   bookingId: string
 ): Promise<{ url: string }> => {
-  const res = await fetch(`${BASE_URL}/create-checkout-session`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ bookingId }),
-  });
-
-  const result = await res.json().catch(() => ({}));
-  if (!res.ok || !result?.url) {
-    throw new Error(result?.message || "Could not start Stripe checkout.");
+  const result = (await protectedMutation(
+    `${BASE_URL}/create-checkout-session`,
+    "POST",
+    { bookingId }
+  )) as { url?: string } | null;
+  if (!result?.url) {
+    throw new Error("Could not start Stripe checkout.");
   }
-  return result;
+  return { url: result.url };
 };
 
 export const verifyStripeSession = async (
   sessionId: string
 ): Promise<Payment> => {
-  const res = await fetch(`${BASE_URL}/payments/verify-session`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ sessionId }),
-  });
-
-  const result = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new Error(result?.message || "Failed to verify payment.");
-  }
-  return result;
+  return (await protectedMutation(
+    `${BASE_URL}/payments/verify-session`,
+    "POST",
+    { sessionId }
+  )) as Payment;
 };
-
 
 export const handlePayNow = async (bookingId?: string) => {
   if (!bookingId) return;

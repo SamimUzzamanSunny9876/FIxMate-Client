@@ -1,7 +1,15 @@
-import { ApprovalStatus, Booking, BookingStatus, RepairService } from "@/types/fixmate";
+import {
+  ApprovalStatus,
+  Booking,
+  BookingStatus,
+  RepairService,
+} from "@/types/fixmate";
+import { protectedMutation, protectedQuery } from "../core/server";
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000"
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 
+// --- Public Routes (plain fetch) ---
 export const getBrowseServices = async ({
   query = "",
 } = {}): Promise<RepairService[]> => {
@@ -9,57 +17,30 @@ export const getBrowseServices = async ({
     ? `${BASE_URL}/browse-services?${query}`
     : `${BASE_URL}/browse-services`;
 
-  console.log("Fetching URL:", url); // Check your Next.js terminal!
-
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) return [];
   return res.json();
 };
 
+export const getServiceDetails = async ({ id }: { id: string }) => {
+  const res = await fetch(`${BASE_URL}/browse-services/${id}`, {
+    cache: "no-store",
+  });
+  return res.json();
+};
 
-export const getServiceDetails = async ({id} :{id: string}) =>{
-  const res = await fetch(`${BASE_URL}/browse-services/${id}`)
-  return res.json()
-
-}
-
-//customer booking api 
-
-export const customerBookings = async (
-  email: string
-): Promise<Booking[]> => {
-  const res = await fetch(
-    `${BASE_URL}/bookings?customerEmail=${encodeURIComponent(email)}`,
-    {
-      method: "GET",
-      credentials: "include",
-      cache: "no-store",
-    }
+// --- Protected Routes ---
+export const customerBookings = async (email: string): Promise<Booking[]> => {
+  const result = await protectedQuery<Booking[] | { data?: Booking[] }>(
+    `${BASE_URL}/bookings?customerEmail=${encodeURIComponent(email)}`
   );
-
-  const result = await res.json().catch(() => []);
-  if (!res.ok) {
-    throw new Error(result?.message || "Failed to load your bookings.");
-  }
   return Array.isArray(result) ? result : (result?.data ?? []);
 };
 
-
-
 export const technicianBookings = async (email: string): Promise<Booking[]> => {
-  const res = await fetch(
-    `${BASE_URL}/bookings?technicianEmail=${encodeURIComponent(email)}`,
-    {
-      method: "GET",
-      credentials: "include",
-      cache: "no-store",
-    }
+  const result = await protectedQuery<Booking[] | { data?: Booking[] }>(
+    `${BASE_URL}/bookings?technicianEmail=${encodeURIComponent(email)}`
   );
-
-  const result = await res.json().catch(() => []);
-  if (!res.ok) {
-    throw new Error(result?.message || "Failed to load incoming job requests.");
-  }
   return Array.isArray(result) ? result : (result?.data ?? []);
 };
 
@@ -67,33 +48,13 @@ export const updateBookingStatus = async (
   id: string,
   payload: { status: BookingStatus; finalAmount?: number }
 ) => {
-  const res = await fetch(`${BASE_URL}/bookings/${id}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(payload),
-  });
-
-  const result = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new Error(result?.message || "Failed to update booking status.");
-  }
-  return result;
+  return protectedMutation(`${BASE_URL}/bookings/${id}`, "PATCH", payload);
 };
 
-
-
 export const getAdminServices = async (): Promise<RepairService[]> => {
-  const res = await fetch(`${BASE_URL}/admin/services`, {
-    method: "GET",
-    credentials: "include",
-    cache: "no-store",
-  });
-
-  const result = await res.json().catch(() => []);
-  if (!res.ok) {
-    throw new Error(result?.message || "Failed to load services for review.");
-  }
+  const result = await protectedQuery<
+    RepairService[] | { data?: RepairService[] }
+  >(`${BASE_URL}/admin/services`);
   return Array.isArray(result) ? result : (result?.data ?? []);
 };
 
@@ -101,16 +62,9 @@ export const updateServiceApproval = async (
   id: string,
   approvalStatus: ApprovalStatus
 ) => {
-  const res = await fetch(`${BASE_URL}/admin/services/${id}/approval`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ approvalStatus }),
-  });
-
-  const result = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new Error(result?.message || "Failed to update approval status.");
-  }
-  return result;
+  return protectedMutation(
+    `${BASE_URL}/admin/services/${id}/approval`,
+    "PATCH",
+    { approvalStatus }
+  );
 };
