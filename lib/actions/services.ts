@@ -2,7 +2,7 @@
 
 import { Booking, CreateServicePayload, RepairService } from "@/types/fixmate";
 import { User } from "@/types/fixmate";
-import { authFetch, protectedMutation } from "../core/server";
+import {  protectedMutation, protectedQuery } from "../core/server";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
@@ -34,95 +34,31 @@ export const createService = async (data: CreateServicePayload) => {
 
 // getTechnicianServices 
 
-export const getTechnicianServices = async (
-  email: string
-): Promise<RepairService[]> => {
-  const api = `${BASE_URL}/services?technicianEmail=${encodeURIComponent(email)}`;
-  const res = await authFetch(api, {
-    method: "GET",
-    cache: "no-store",
-  });
-
-  const result = await res.json().catch(() => []);
-  if (!res.ok) {
-    throw new Error(result?.message || "Failed to load your services.");
-  }
-
-  const list = Array.isArray(result) ? result : (result?.data ?? []);
-  return JSON.parse(JSON.stringify(list));
-};
+export const getTechnicianServices = (email: string) =>
+  protectedQuery<RepairService[]>(
+    `${BASE_URL}/services?technicianEmail=${encodeURIComponent(email)}`
+  );
 
 // updateTechnician Services
 
-export const updateService = async (
-  id: string,
-  data: UpdateServicePayload
-): Promise<RepairService> => {
-  const res = await fetch(`${BASE_URL}/services/${id}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(data),
-  });
-
-  const result = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new Error(result?.message || "Failed to update service.");
-  }
-  return result?.data ?? result;
-};
+export const updateService = (id: string, data: UpdateServicePayload) =>
+  protectedMutation(`${BASE_URL}/services/${id}`, "PATCH", data);
 
 //. deletetechnicianServices 
 
-export const deleteService = async (id: string) => {
-  const res = await fetch(`${BASE_URL}/services/${id}`, {
-    method: "DELETE",
-    credentials: "include",
-  });
-
-  const result = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new Error(result?.message || "Failed to delete service.");
-  }
-  return result;
-};
+export const deleteService = (id: string) =>
+  protectedMutation(`${BASE_URL}/services/${id}`, "DELETE");
 
 
 // making customer bookings  api 
 
-export const customerBookingService= async (data: Booking) => {
-      const booking = await fetch(`${BASE_URL}/bookings`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify(data),
-      });
-
-      const result = await booking.json().catch(() => ({}));
-      if (!booking.ok) {
-        throw new Error(
-          result?.message || "Failed to submit repair request."
-        );
-      }
-
-}
+export const customerBookingService = (data: Booking) =>
+  protectedMutation(`${BASE_URL}/bookings`, "POST", data);
 
 //cancel booking by customer 
 
-export const cancelCustomerBooking = async (id: string) => {
-  const res = await fetch(`${BASE_URL}/bookings/${id}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify({ status: "cancelled" }),
-  });
-
-  const result = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new Error(result?.message || "Failed to cancel booking.");
-  }
-  return result;
-};
+export const cancelCustomerBooking = (id: string) =>
+  protectedMutation(`${BASE_URL}/bookings/${id}`, "PATCH", { status: "cancelled" });
 
 
 
@@ -134,31 +70,8 @@ export type ProfileUpdatePayload = {
   bio?: string;
 };
 
-export const getUserProfile = async (email: string): Promise<User | null> => {
-  const res = await fetch(`${BASE_URL}/user/${encodeURIComponent(email)}`, {
-    method: "GET",
-    credentials: "include",
-    cache: "no-store",
-  });
+export const getUserProfile = (email: string) =>
+  protectedQuery<User | null>(`${BASE_URL}/user/${encodeURIComponent(email)}`);
 
-  if (!res.ok) return null;
-  return res.json();
-};
-
-export const profileUpdate = async (
-  email: string,
-  data: ProfileUpdatePayload
-) => {
-  const res = await fetch(`${BASE_URL}/user/${encodeURIComponent(email)}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    credentials: "include",
-    body: JSON.stringify(data),
-  });
-
-  const result = await res.json().catch(() => ({}));
-  if (!res.ok) {
-    throw new Error(result?.message || "Failed to update profile.");
-  }
-  return result;
-};
+export const profileUpdate = (email: string, data: ProfileUpdatePayload) =>
+  protectedMutation(`${BASE_URL}/user/${encodeURIComponent(email)}`, "PATCH", data);

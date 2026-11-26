@@ -19,21 +19,25 @@ export const getToken = async () =>{
 }
 
 
-export const authFetch = async (
-  api: string,
-  options: RequestInit = {}
-): Promise<Response> => {
-  "use server";
-
+// Use for all private GET requests
+export const protectedQuery = async <T = unknown>(api: string): Promise<T> => {
   const token = await getToken();
-  return fetch(api, {
-    ...options,
+
+  const res = await fetch(api, {
+    method: "GET",
     headers: {
       "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options.headers,
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
     },
+    cache: "no-store",
   });
+
+  const result = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(result?.message || `Request failed (${res.status})`);
+  }
+
+  return result as T;
 };
 
 export const protectedMutation = async (api : string, method: string, data?: unknown)=>{
