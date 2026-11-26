@@ -15,19 +15,8 @@ const BASE_URL =
   >
 >;
 
-export const createService = async (data: CreateServicePayload) => {
-  const res = await protectedMutation(`${BASE_URL}/services`, "POST", data);
-
- 
-
-  const result = await res.json().catch(() => ({}));
-
-  if (!res.ok) {
-    throw new Error(result?.message || "Failed to publish service.");
-  }
-
-  return result;
-};
+export const createService = (data: CreateServicePayload) =>
+  protectedMutation(`${BASE_URL}/services`, "POST", data);
 
 
 

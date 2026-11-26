@@ -40,21 +40,29 @@ export const protectedQuery = async <T = unknown>(api: string): Promise<T> => {
   return result as T;
 };
 
-export const protectedMutation = async (api : string, method: string, data?: unknown)=>{
+export const protectedMutation = async <T = unknown>(
+  api: string,
+  method: "POST" | "PATCH" | "PUT" | "DELETE",
+  data?: unknown
+): Promise<T> => {
+  const token = await getToken();
 
+  const res = await fetch(api, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { authorization: `Bearer ${token}` } : {}),
+    },
+    body: data !== undefined ? JSON.stringify(data) : undefined,
+  });
 
-     const token = await getToken();
-     const res = await fetch(api,{
-        method: method,
-        headers: {
-             "Content-Type": "application/json",
-             authorization: `Bearer ${token}`
-        },
-        body: data ? JSON.stringify(data) : undefined 
+  const result = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(result?.message || `Request failed (${res.status})`);
+  }
 
-     })
-     return res; 
-}
+  return result as T;
+};
 export const requiredRole = async( role : string) => {
 
     const session  = await getSession()
