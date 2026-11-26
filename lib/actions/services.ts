@@ -1,5 +1,8 @@
+'use server';
+
 import { Booking, CreateServicePayload, RepairService } from "@/types/fixmate";
 import { User } from "@/types/fixmate";
+import { authFetch, protectedMutation } from "../core/server";
 
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
@@ -13,14 +16,9 @@ const BASE_URL =
 >;
 
 export const createService = async (data: CreateServicePayload) => {
-  const res = await fetch(`${BASE_URL}/services`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    credentials: "include",
-    body: JSON.stringify(data),
-  });
+  const res = await protectedMutation(`${BASE_URL}/services`, "POST", data);
+
+ 
 
   const result = await res.json().catch(() => ({}));
 
@@ -39,20 +37,19 @@ export const createService = async (data: CreateServicePayload) => {
 export const getTechnicianServices = async (
   email: string
 ): Promise<RepairService[]> => {
-  const res = await fetch(
-    `${BASE_URL}/services?technicianEmail=${encodeURIComponent(email)}`,
-    {
-      method: "GET",
-      credentials: "include",
-      cache: "no-store",
-    }
-  );
+  const api = `${BASE_URL}/services?technicianEmail=${encodeURIComponent(email)}`;
+  const res = await authFetch(api, {
+    method: "GET",
+    cache: "no-store",
+  });
 
   const result = await res.json().catch(() => []);
   if (!res.ok) {
     throw new Error(result?.message || "Failed to load your services.");
   }
-  return Array.isArray(result) ? result : (result?.data ?? []);
+
+  const list = Array.isArray(result) ? result : (result?.data ?? []);
+  return JSON.parse(JSON.stringify(list));
 };
 
 // updateTechnician Services
