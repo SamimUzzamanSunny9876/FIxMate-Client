@@ -661,7 +661,8 @@ const AdminAllBookingsPage = () => {
                   </p>
                 </div>
 
-                {selectedBooking.statusHistory &&
+                {"statusHistory" in selectedBooking &&
+                  Array.isArray(selectedBooking.statusHistory) &&
                   selectedBooking.statusHistory.length > 0 && (
                     <div>
                       <p className="mb-2 text-xs font-semibold text-slate-500 uppercase">

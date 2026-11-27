@@ -3,12 +3,30 @@ import { MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { admin } from "better-auth/plugins";
 
-const client = new MongoClient(process.env.BETTER_AUTH_DB_URI as string);
+const globalForMongo = globalThis as unknown as {
+  betterAuthMongoClient?: MongoClient;
+};
+
+const client =
+  globalForMongo.betterAuthMongoClient ??
+  new MongoClient(process.env.BETTER_AUTH_DB_URI as string);
+
+if (process.env.NODE_ENV !== "production") {
+  globalForMongo.betterAuthMongoClient = client;
+}
+
 const db = client.db("FixMatedb");
 
 export const auth = betterAuth({
+  baseURL: process.env.BETTER_AUTH_URL,
+  trustedOrigins: [
+    "http://localhost:3000",
+    "https://fix-mate-client-sepia.vercel.app",
+    "https://*.vercel.app",
+  ],
   emailAndPassword: {
     enabled: true,
+    minPasswordLength: 6,
   },
   user: {
     additionalFields: {
