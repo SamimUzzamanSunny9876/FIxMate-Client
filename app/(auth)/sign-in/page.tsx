@@ -49,31 +49,20 @@ export default function SignInPage({
   const router = useRouter()
   const searchParams = useSearchParams()
 
+  // Supports redirecting back to a protected page or service details page
+  const rawCallback =
+    searchParams.get("redirectTo") ||
+    searchParams.get("callbackUrl") ||
+    searchParams.get("redirect")
 
-    // Supports redirecting back to a protected page or service details page
- const rawCallback =
-  searchParams.get("redirectTo") ||
-  searchParams.get("callbackUrl") ||
-  searchParams.get("redirect")
-
-
-
-const safeCallbackUrl =
-  rawCallback && rawCallback.startsWith("/") ? rawCallback : null
-
-  
-
-
- 
+  const safeCallbackUrl =
+    rawCallback && rawCallback.startsWith("/") ? rawCallback : null
 
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
-
-
- 
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
@@ -93,19 +82,15 @@ const safeCallbackUrl =
     return Object.keys(newErrors).length === 0
   }
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!validateForm()) return
 
     setIsLoading(true)
     try {
-      // Replace with your BetterAuth client call:
-     
       const { data, error } = await authClient.signIn.email({
         email,
         password,
-     
       })
 
       if (error) {
@@ -144,7 +129,7 @@ const safeCallbackUrl =
   return (
     <div
       className={cn(
-        "relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#F8FAFC] px-4 py-12 sm:px-6 lg:px-8",
+        "relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#F8FAFC] px-4 py-12 transition-colors duration-300 sm:px-6 lg:px-8 dark:bg-slate-950",
         className
       )}
       {...props}
@@ -154,8 +139,8 @@ const safeCallbackUrl =
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
       >
-        <div className="absolute -top-32 right-0 h-[480px] w-[480px] rounded-full bg-gradient-to-br from-indigo-200/45 via-sky-200/40 to-emerald-100/40 blur-3xl" />
-        <div className="absolute -bottom-32 -left-20 h-[420px] w-[420px] rounded-full bg-gradient-to-tr from-violet-200/40 via-indigo-100/30 to-sky-100/40 blur-3xl" />
+        <div className="absolute -top-32 right-0 h-[480px] w-[480px] rounded-full bg-gradient-to-br from-indigo-200/45 via-sky-200/40 to-emerald-100/40 blur-3xl dark:from-indigo-600/20 dark:via-sky-600/15 dark:to-emerald-500/10" />
+        <div className="absolute -bottom-32 -left-20 h-[420px] w-[420px] rounded-full bg-gradient-to-tr from-violet-200/40 via-indigo-100/30 to-sky-100/40 blur-3xl dark:from-violet-600/20 dark:via-indigo-600/15 dark:to-sky-600/10" />
       </div>
 
       <div className="w-full max-w-md animate-in space-y-6 duration-700 fade-in slide-in-from-bottom-6">
@@ -168,19 +153,19 @@ const safeCallbackUrl =
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-6">
               <Wrench className="h-5 w-5 stroke-[2.5]" />
             </div>
-            <span className="text-2xl font-bold tracking-tight text-slate-900">
+            <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
               FixMate
             </span>
           </Link>
         </div>
 
         {/* Glassmorphic Sign In Card */}
-        <Card className="rounded-3xl border border-white/80 bg-white/85 shadow-[0_20px_50px_-15px_rgba(79,70,229,0.12)] backdrop-blur-xl transition-all duration-300">
+        <Card className="rounded-3xl border border-white/80 bg-white/85 shadow-[0_20px_50px_-15px_rgba(79,70,229,0.12)] backdrop-blur-xl transition-all duration-300 dark:border-slate-800/80 dark:bg-slate-900/85 dark:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)]">
           <CardHeader className="space-y-1.5 pb-4 text-center">
-            <CardTitle className="text-2xl font-extrabold tracking-tight text-slate-900">
+            <CardTitle className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               Welcome back
             </CardTitle>
-            <CardDescription className="text-sm text-slate-500">
+            <CardDescription className="text-sm text-slate-500 dark:text-slate-400">
               Sign in to manage your repairs, bookings, or services
             </CardDescription>
           </CardHeader>
@@ -195,7 +180,7 @@ const safeCallbackUrl =
                     type="button"
                     disabled={isLoading}
                     onClick={handleGoogleSignIn}
-                    className="h-11 w-full rounded-xl border-slate-200/90 bg-white font-medium text-slate-700 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:bg-slate-50/80 hover:shadow-sm"
+                    className="h-11 w-full rounded-xl border-slate-200/90 bg-white font-medium text-slate-700 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:bg-slate-50/80 hover:shadow-sm dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-200 dark:hover:border-indigo-700 dark:hover:bg-slate-900"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -211,7 +196,7 @@ const safeCallbackUrl =
                   </Button>
                 </Field>
 
-                <FieldSeparator className="text-xs text-slate-400 *:data-[slot=field-separator-content]:bg-white/90">
+                <FieldSeparator className="text-xs text-slate-400 *:data-[slot=field-separator-content]:bg-white/90 dark:text-slate-500 dark:*:data-[slot=field-separator-content]:bg-slate-900">
                   Or sign in with email
                 </FieldSeparator>
 
@@ -219,7 +204,7 @@ const safeCallbackUrl =
                 <Field>
                   <FieldLabel
                     htmlFor="email"
-                    className="text-sm font-medium text-slate-700"
+                    className="text-sm font-medium text-slate-700 dark:text-slate-300"
                   >
                     Email Address
                   </FieldLabel>
@@ -236,14 +221,14 @@ const safeCallbackUrl =
                         setErrors({ ...errors, email: undefined })
                     }}
                     className={cn(
-                      "h-11 rounded-xl border-slate-200/90 bg-white/90 text-slate-900 transition-all placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/10",
+                      "h-11 rounded-xl border-slate-200/90 bg-white/90 text-slate-900 transition-all placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/10 dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus-visible:border-indigo-400 dark:focus-visible:ring-indigo-500/20",
                       errors.email &&
-                        "border-red-400 focus-visible:border-red-500 focus-visible:ring-red-500/10"
+                        "border-red-400 focus-visible:border-red-500 focus-visible:ring-red-500/10 dark:border-red-500/80"
                     )}
                     required
                   />
                   {errors.email && (
-                    <p className="mt-1 animate-in text-xs font-medium text-red-500 duration-200 fade-in slide-in-from-top-1">
+                    <p className="mt-1 animate-in text-xs font-medium text-red-500 duration-200 fade-in slide-in-from-top-1 dark:text-red-400">
                       {errors.email}
                     </p>
                   )}
@@ -254,7 +239,7 @@ const safeCallbackUrl =
                   <div className="flex items-center justify-between">
                     <FieldLabel
                       htmlFor="password"
-                      className="text-sm font-medium text-slate-700"
+                      className="text-sm font-medium text-slate-700 dark:text-slate-300"
                     >
                       Password
                     </FieldLabel>
@@ -273,9 +258,9 @@ const safeCallbackUrl =
                           setErrors({ ...errors, password: undefined })
                       }}
                       className={cn(
-                        "h-11 rounded-xl border-slate-200/90 bg-white/90 pr-10 text-slate-900 transition-all placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/10",
+                        "h-11 rounded-xl border-slate-200/90 bg-white/90 pr-10 text-slate-900 transition-all placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/10 dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus-visible:border-indigo-400 dark:focus-visible:ring-indigo-500/20",
                         errors.password &&
-                          "border-red-400 focus-visible:border-red-500 focus-visible:ring-red-500/10"
+                          "border-red-400 focus-visible:border-red-500 focus-visible:ring-red-500/10 dark:border-red-500/80"
                       )}
                       required
                     />
@@ -285,7 +270,7 @@ const safeCallbackUrl =
                       aria-label={
                         showPassword ? "Hide password" : "Show password"
                       }
-                      className="absolute top-1/2 right-3 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600"
+                      className="absolute top-1/2 right-3 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
                     >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4" />
@@ -295,7 +280,7 @@ const safeCallbackUrl =
                     </button>
                   </div>
                   {errors.password && (
-                    <p className="mt-1 animate-in text-xs font-medium text-red-500 duration-200 fade-in slide-in-from-top-1">
+                    <p className="mt-1 animate-in text-xs font-medium text-red-500 duration-200 fade-in slide-in-from-top-1 dark:text-red-400">
                       {errors.password}
                     </p>
                   )}
@@ -318,11 +303,11 @@ const safeCallbackUrl =
                     )}
                   </Button>
 
-                  <FieldDescription className="pt-3 text-center text-sm text-slate-500">
+                  <FieldDescription className="pt-3 text-center text-sm text-slate-500 dark:text-slate-400">
                     Don&apos;t have an account?{" "}
                     <Link
                       href="/sign-up"
-                      className="font-semibold text-indigo-600 underline-offset-4 transition-colors hover:text-indigo-700 hover:underline"
+                      className="font-semibold text-indigo-600 underline-offset-4 transition-colors hover:text-indigo-700 hover:underline dark:text-indigo-400 dark:hover:text-indigo-300"
                     >
                       Sign Up
                     </Link>
@@ -334,8 +319,8 @@ const safeCallbackUrl =
         </Card>
 
         {/* Bottom Trust Note */}
-        <div className="flex items-center justify-center gap-1.5 text-xs text-slate-500">
-          <ShieldCheck className="h-4 w-4 text-emerald-600" />
+        <div className="flex items-center justify-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+          <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           <span>Secure login with role-based access protection</span>
         </div>
       </div>

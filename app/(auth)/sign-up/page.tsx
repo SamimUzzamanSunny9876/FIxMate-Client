@@ -149,13 +149,13 @@ export default function SignUpPage({
         uploadedImageUrl = await uploadToImgBB(imageFile)
       }
 
-    const { data, error } = await authClient.signUp.email({
-  name: name.trim(),
-  email: email.trim(),
-  password,
-  image: uploadedImageUrl,
-  signupRole: role,
-})
+      const { data, error } = await authClient.signUp.email({
+        name: name.trim(),
+        email: email.trim(),
+        password,
+        image: uploadedImageUrl,
+        signupRole: role,
+      })
 
       if (error) {
         toast.error(error.message || "Failed to create account.")
@@ -197,18 +197,18 @@ export default function SignUpPage({
   return (
     <div
       className={cn(
-        "relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#F8FAFC] px-4 py-12 sm:px-6 lg:px-8",
+        "relative flex min-h-screen w-full items-center justify-center overflow-hidden bg-[#F8FAFC] px-4 py-12 transition-colors duration-300 sm:px-6 lg:px-8 dark:bg-slate-950",
         className
       )}
       {...props}
     >
-      {/* Ambient Background Gradient Mesh (matches Banner & Footer) */}
+      {/* Ambient Background Gradient Mesh */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-0 -z-10 overflow-hidden"
       >
-        <div className="absolute -top-32 right-0 h-[480px] w-[480px] rounded-full bg-gradient-to-br from-indigo-200/45 via-sky-200/40 to-emerald-100/40 blur-3xl" />
-        <div className="absolute -bottom-32 -left-20 h-[420px] w-[420px] rounded-full bg-gradient-to-tr from-violet-200/40 via-indigo-100/30 to-sky-100/40 blur-3xl" />
+        <div className="absolute -top-32 right-0 h-[480px] w-[480px] rounded-full bg-gradient-to-br from-indigo-200/45 via-sky-200/40 to-emerald-100/40 blur-3xl dark:from-indigo-600/20 dark:via-sky-600/15 dark:to-emerald-500/10" />
+        <div className="absolute -bottom-32 -left-20 h-[420px] w-[420px] rounded-full bg-gradient-to-tr from-violet-200/40 via-indigo-100/30 to-sky-100/40 blur-3xl dark:from-violet-600/20 dark:via-indigo-600/15 dark:to-sky-600/10" />
       </div>
 
       <div className="w-full max-w-md animate-in space-y-6 duration-700 fade-in slide-in-from-bottom-6">
@@ -221,19 +221,19 @@ export default function SignUpPage({
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-6">
               <Wrench className="h-5 w-5 stroke-[2.5]" />
             </div>
-            <span className="text-2xl font-bold tracking-tight text-slate-900">
+            <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
               FixMate
             </span>
           </Link>
         </div>
 
         {/* Glassmorphic Sign Up Card */}
-        <Card className="rounded-3xl border border-white/80 bg-white/85 shadow-[0_20px_50px_-15px_rgba(79,70,229,0.12)] backdrop-blur-xl transition-all duration-300">
+        <Card className="rounded-3xl border border-white/80 bg-white/85 shadow-[0_20px_50px_-15px_rgba(79,70,229,0.12)] backdrop-blur-xl transition-all duration-300 dark:border-slate-800/80 dark:bg-slate-900/85 dark:shadow-[0_20px_50px_-15px_rgba(0,0,0,0.5)]">
           <CardHeader className="space-y-1.5 pb-4 text-center">
-            <CardTitle className="text-2xl font-extrabold tracking-tight text-slate-900">
+            <CardTitle className="text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white">
               Create your account
             </CardTitle>
-            <CardDescription className="text-sm text-slate-500">
+            <CardDescription className="text-sm text-slate-500 dark:text-slate-400">
               Join FixMate to book trusted repairs or offer your services
             </CardDescription>
           </CardHeader>
@@ -248,7 +248,7 @@ export default function SignUpPage({
                     type="button"
                     disabled={isLoading}
                     onClick={handleGoogleSignUp}
-                    className="h-11 w-full rounded-xl border-slate-200/90 bg-white font-medium text-slate-700 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:bg-slate-50/80 hover:shadow-sm"
+                    className="h-11 w-full rounded-xl border-slate-200/90 bg-white font-medium text-slate-700 shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-indigo-200 hover:bg-slate-50/80 hover:shadow-sm dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-200 dark:hover:border-indigo-700 dark:hover:bg-slate-900"
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -264,13 +264,13 @@ export default function SignUpPage({
                   </Button>
                 </Field>
 
-                <FieldSeparator className="text-xs text-slate-400 *:data-[slot=field-separator-content]:bg-white/90">
+                <FieldSeparator className="text-xs text-slate-400 *:data-[slot=field-separator-content]:bg-white/90 dark:text-slate-500 dark:*:data-[slot=field-separator-content]:bg-slate-900">
                   Or sign up with email
                 </FieldSeparator>
 
                 {/* Role Selection Cards (Customer / Technician only) */}
                 <Field>
-                  <FieldLabel className="text-xs font-semibold tracking-wider text-slate-600 uppercase">
+                  <FieldLabel className="text-xs font-semibold tracking-wider text-slate-600 uppercase dark:text-slate-400">
                     I want to join as
                   </FieldLabel>
                   <div className="grid grid-cols-2 gap-3 pt-1">
@@ -280,8 +280,8 @@ export default function SignUpPage({
                       className={cn(
                         "group relative flex flex-col items-start gap-1.5 rounded-2xl border p-3.5 text-left transition-all duration-300",
                         role === "customer"
-                          ? "border-indigo-500 bg-indigo-50/70 shadow-sm ring-2 ring-indigo-500/20"
-                          : "border-slate-200/80 bg-white/70 hover:border-indigo-200 hover:bg-slate-50/80"
+                          ? "border-indigo-500 bg-indigo-50/70 shadow-sm ring-2 ring-indigo-500/20 dark:border-indigo-500 dark:bg-indigo-950/50 dark:ring-indigo-500/30"
+                          : "border-slate-200/80 bg-white/70 hover:border-indigo-200 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-950/70 dark:hover:border-indigo-700 dark:hover:bg-slate-900"
                       )}
                     >
                       <div className="flex w-full items-center justify-between">
@@ -290,7 +290,7 @@ export default function SignUpPage({
                             "flex h-8 w-8 items-center justify-center rounded-xl transition-colors",
                             role === "customer"
                               ? "bg-indigo-600 text-white shadow-sm shadow-indigo-500/30"
-                              : "bg-slate-100 text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-600"
+                              : "bg-slate-100 text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-600 dark:bg-slate-800 dark:text-slate-300 dark:group-hover:bg-indigo-950 dark:group-hover:text-indigo-400"
                           )}
                         >
                           <UserIcon className="h-4 w-4" />
@@ -300,7 +300,7 @@ export default function SignUpPage({
                             "flex h-4 w-4 items-center justify-center rounded-full border transition-all",
                             role === "customer"
                               ? "scale-100 border-indigo-600 bg-indigo-600 text-white"
-                              : "scale-90 border-slate-300"
+                              : "scale-90 border-slate-300 dark:border-slate-700"
                           )}
                         >
                           {role === "customer" && (
@@ -308,10 +308,10 @@ export default function SignUpPage({
                           )}
                         </span>
                       </div>
-                      <span className="text-sm font-semibold text-slate-900">
+                      <span className="text-sm font-semibold text-slate-900 dark:text-white">
                         Customer
                       </span>
-                      <span className="text-[11px] leading-tight text-slate-500">
+                      <span className="text-[11px] leading-tight text-slate-500 dark:text-slate-400">
                         Book & track device repairs
                       </span>
                     </button>
@@ -322,8 +322,8 @@ export default function SignUpPage({
                       className={cn(
                         "group relative flex flex-col items-start gap-1.5 rounded-2xl border p-3.5 text-left transition-all duration-300",
                         role === "technician"
-                          ? "border-indigo-500 bg-indigo-50/70 shadow-sm ring-2 ring-indigo-500/20"
-                          : "border-slate-200/80 bg-white/70 hover:border-indigo-200 hover:bg-slate-50/80"
+                          ? "border-indigo-500 bg-indigo-50/70 shadow-sm ring-2 ring-indigo-500/20 dark:border-indigo-500 dark:bg-indigo-950/50 dark:ring-indigo-500/30"
+                          : "border-slate-200/80 bg-white/70 hover:border-indigo-200 hover:bg-slate-50/80 dark:border-slate-800 dark:bg-slate-950/70 dark:hover:border-indigo-700 dark:hover:bg-slate-900"
                       )}
                     >
                       <div className="flex w-full items-center justify-between">
@@ -332,7 +332,7 @@ export default function SignUpPage({
                             "flex h-8 w-8 items-center justify-center rounded-xl transition-colors",
                             role === "technician"
                               ? "bg-indigo-600 text-white shadow-sm shadow-indigo-500/30"
-                              : "bg-slate-100 text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-600"
+                              : "bg-slate-100 text-slate-600 group-hover:bg-indigo-100 group-hover:text-indigo-600 dark:bg-slate-800 dark:text-slate-300 dark:group-hover:bg-indigo-950 dark:group-hover:text-indigo-400"
                           )}
                         >
                           <Wrench className="h-4 w-4" />
@@ -342,7 +342,7 @@ export default function SignUpPage({
                             "flex h-4 w-4 items-center justify-center rounded-full border transition-all",
                             role === "technician"
                               ? "scale-100 border-indigo-600 bg-indigo-600 text-white"
-                              : "scale-90 border-slate-300"
+                              : "scale-90 border-slate-300 dark:border-slate-700"
                           )}
                         >
                           {role === "technician" && (
@@ -350,10 +350,10 @@ export default function SignUpPage({
                           )}
                         </span>
                       </div>
-                      <span className="text-sm font-semibold text-slate-900">
+                      <span className="text-sm font-semibold text-slate-900 dark:text-white">
                         Technician
                       </span>
-                      <span className="text-[11px] leading-tight text-slate-500">
+                      <span className="text-[11px] leading-tight text-slate-500 dark:text-slate-400">
                         List services & manage jobs
                       </span>
                     </button>
@@ -364,7 +364,7 @@ export default function SignUpPage({
                 <Field>
                   <FieldLabel
                     htmlFor="name"
-                    className="text-sm font-medium text-slate-700"
+                    className="text-sm font-medium text-slate-700 dark:text-slate-300"
                   >
                     Full Name
                   </FieldLabel>
@@ -379,14 +379,14 @@ export default function SignUpPage({
                       if (errors.name) setErrors({ ...errors, name: undefined })
                     }}
                     className={cn(
-                      "h-11 rounded-xl border-slate-200/90 bg-white/90 text-slate-900 transition-all placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/10",
+                      "h-11 rounded-xl border-slate-200/90 bg-white/90 text-slate-900 transition-all placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/10 dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus-visible:border-indigo-400 dark:focus-visible:ring-indigo-500/20",
                       errors.name &&
-                        "border-red-400 focus-visible:border-red-500 focus-visible:ring-red-500/10"
+                        "border-red-400 focus-visible:border-red-500 focus-visible:ring-red-500/10 dark:border-red-500/80"
                     )}
                     required
                   />
                   {errors.name && (
-                    <p className="mt-1 animate-in text-xs font-medium text-red-500 duration-200 fade-in slide-in-from-top-1">
+                    <p className="mt-1 animate-in text-xs font-medium text-red-500 duration-200 fade-in slide-in-from-top-1 dark:text-red-400">
                       {errors.name}
                     </p>
                   )}
@@ -396,7 +396,7 @@ export default function SignUpPage({
                 <Field>
                   <FieldLabel
                     htmlFor="email"
-                    className="text-sm font-medium text-slate-700"
+                    className="text-sm font-medium text-slate-700 dark:text-slate-300"
                   >
                     Email Address
                   </FieldLabel>
@@ -412,14 +412,14 @@ export default function SignUpPage({
                         setErrors({ ...errors, email: undefined })
                     }}
                     className={cn(
-                      "h-11 rounded-xl border-slate-200/90 bg-white/90 text-slate-900 transition-all placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/10",
+                      "h-11 rounded-xl border-slate-200/90 bg-white/90 text-slate-900 transition-all placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/10 dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus-visible:border-indigo-400 dark:focus-visible:ring-indigo-500/20",
                       errors.email &&
-                        "border-red-400 focus-visible:border-red-500 focus-visible:ring-red-500/10"
+                        "border-red-400 focus-visible:border-red-500 focus-visible:ring-red-500/10 dark:border-red-500/80"
                     )}
                     required
                   />
                   {errors.email && (
-                    <p className="mt-1 animate-in text-xs font-medium text-red-500 duration-200 fade-in slide-in-from-top-1">
+                    <p className="mt-1 animate-in text-xs font-medium text-red-500 duration-200 fade-in slide-in-from-top-1 dark:text-red-400">
                       {errors.email}
                     </p>
                   )}
@@ -429,21 +429,23 @@ export default function SignUpPage({
                 <Field>
                   <FieldLabel
                     htmlFor="image"
-                    className="text-sm font-medium text-slate-700"
+                    className="text-sm font-medium text-slate-700 dark:text-slate-300"
                   >
                     Profile Photo{" "}
-                    <span className="text-slate-400">(Optional)</span>
+                    <span className="text-slate-400 dark:text-slate-500">
+                      (Optional)
+                    </span>
                   </FieldLabel>
 
-                  <div className="flex items-center gap-3 rounded-2xl border border-dashed border-slate-200/90 bg-white/80 p-3">
+                  <div className="flex items-center gap-3 rounded-2xl border border-dashed border-slate-200/90 bg-white/80 p-3 dark:border-slate-800 dark:bg-slate-950/70">
                     {imagePreview ? (
                       <img
                         src={imagePreview}
                         alt="Profile preview"
-                        className="h-12 w-12 shrink-0 rounded-full border border-indigo-200 object-cover"
+                        className="h-12 w-12 shrink-0 rounded-full border border-indigo-200 object-cover dark:border-indigo-700"
                       />
                     ) : (
-                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400">
                         <Upload className="h-5 w-5" />
                       </div>
                     )}
@@ -451,7 +453,7 @@ export default function SignUpPage({
                     <div className="min-w-0 flex-1">
                       <label
                         htmlFor="image"
-                        className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-indigo-50 hover:text-indigo-700"
+                        className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-indigo-50 hover:text-indigo-700 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-indigo-950/70 dark:hover:text-indigo-300"
                       >
                         <Upload className="h-3.5 w-3.5" />
                         {imageFile ? "Change Photo" : "Choose Image"}
@@ -464,7 +466,7 @@ export default function SignUpPage({
                         onChange={handleImageChange}
                         className="hidden"
                       />
-                      <p className="mt-1 truncate text-[11px] text-slate-400">
+                      <p className="mt-1 truncate text-[11px] text-slate-400 dark:text-slate-500">
                         {imageFile
                           ? imageFile.name
                           : "PNG, JPG, or WEBP up to 5MB"}
@@ -476,7 +478,7 @@ export default function SignUpPage({
                         type="button"
                         onClick={handleRemoveImage}
                         aria-label="Remove selected image"
-                        className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                        className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500 dark:text-slate-500 dark:hover:bg-red-950/50 dark:hover:text-red-400"
                       >
                         <X className="h-4 w-4" />
                       </button>
@@ -488,7 +490,7 @@ export default function SignUpPage({
                 <Field>
                   <FieldLabel
                     htmlFor="password"
-                    className="text-sm font-medium text-slate-700"
+                    className="text-sm font-medium text-slate-700 dark:text-slate-300"
                   >
                     Password
                   </FieldLabel>
@@ -505,9 +507,9 @@ export default function SignUpPage({
                           setErrors({ ...errors, password: undefined })
                       }}
                       className={cn(
-                        "h-11 rounded-xl border-slate-200/90 bg-white/90 pr-10 text-slate-900 transition-all placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/10",
+                        "h-11 rounded-xl border-slate-200/90 bg-white/90 pr-10 text-slate-900 transition-all placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/10 dark:border-slate-800 dark:bg-slate-950/80 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus-visible:border-indigo-400 dark:focus-visible:ring-indigo-500/20",
                         errors.password &&
-                          "border-red-400 focus-visible:border-red-500 focus-visible:ring-red-500/10"
+                          "border-red-400 focus-visible:border-red-500 focus-visible:ring-red-500/10 dark:border-red-500/80"
                       )}
                       required
                     />
@@ -517,7 +519,7 @@ export default function SignUpPage({
                       aria-label={
                         showPassword ? "Hide password" : "Show password"
                       }
-                      className="absolute top-1/2 right-3 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600"
+                      className="absolute top-1/2 right-3 -translate-y-1/2 text-slate-400 transition-colors hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300"
                     >
                       {showPassword ? (
                         <EyeOff className="h-4 w-4" />
@@ -533,8 +535,8 @@ export default function SignUpPage({
                       className={cn(
                         "inline-flex items-center gap-1 transition-colors",
                         hasMinLength
-                          ? "font-medium text-emerald-600"
-                          : "text-slate-400"
+                          ? "font-medium text-emerald-600 dark:text-emerald-400"
+                          : "text-slate-400 dark:text-slate-500"
                       )}
                     >
                       {hasMinLength ? (
@@ -548,8 +550,8 @@ export default function SignUpPage({
                       className={cn(
                         "inline-flex items-center gap-1 transition-colors",
                         hasUppercase
-                          ? "font-medium text-emerald-600"
-                          : "text-slate-400"
+                          ? "font-medium text-emerald-600 dark:text-emerald-400"
+                          : "text-slate-400 dark:text-slate-500"
                       )}
                     >
                       {hasUppercase ? (
@@ -563,8 +565,8 @@ export default function SignUpPage({
                       className={cn(
                         "inline-flex items-center gap-1 transition-colors",
                         hasLowercase
-                          ? "font-medium text-emerald-600"
-                          : "text-slate-400"
+                          ? "font-medium text-emerald-600 dark:text-emerald-400"
+                          : "text-slate-400 dark:text-slate-500"
                       )}
                     >
                       {hasLowercase ? (
@@ -577,7 +579,7 @@ export default function SignUpPage({
                   </div>
 
                   {errors.password && (
-                    <p className="mt-1 animate-in text-xs font-medium text-red-500 duration-200 fade-in slide-in-from-top-1">
+                    <p className="mt-1 animate-in text-xs font-medium text-red-500 duration-200 fade-in slide-in-from-top-1 dark:text-red-400">
                       {errors.password}
                     </p>
                   )}
@@ -602,11 +604,11 @@ export default function SignUpPage({
                     )}
                   </Button>
 
-                  <FieldDescription className="pt-3 text-center text-sm text-slate-500">
+                  <FieldDescription className="pt-3 text-center text-sm text-slate-500 dark:text-slate-400">
                     Already have an account?{" "}
                     <Link
                       href="/sign-in"
-                      className="font-semibold text-indigo-600 underline-offset-4 transition-colors hover:text-indigo-700 hover:underline"
+                      className="font-semibold text-indigo-600 underline-offset-4 transition-colors hover:text-indigo-700 hover:underline dark:text-indigo-400 dark:hover:text-indigo-300"
                     >
                       Sign In
                     </Link>
@@ -618,8 +620,8 @@ export default function SignUpPage({
         </Card>
 
         {/* Bottom Trust Note */}
-        <div className="flex items-center justify-center gap-1.5 text-xs text-slate-500">
-          <ShieldCheck className="h-4 w-4 text-emerald-600" />
+        <div className="flex items-center justify-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
+          <ShieldCheck className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
           <span>Secure authentication & pay-after-completion guarantee</span>
         </div>
       </div>
