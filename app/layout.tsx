@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { NavBar } from "@/components/homePage/NavBar";
 import { Footer } from "@/components/homePage/Footer";
 import { Toaster } from "sonner";
+import { Metadata } from "next";
 
 
 const geist = Geist({subsets:['latin'],variable:'--font-sans'})
@@ -14,6 +15,10 @@ const fontMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
 })
+export const metadata: Metadata = {
+  title: "FixMate | Fast, Verified Repair Services",
+  description: "Request, track, and pay for device & appliance repairs locally with certified professionals.",
+};
 
 export default function RootLayout({
   children,
