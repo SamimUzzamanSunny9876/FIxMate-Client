@@ -12,7 +12,8 @@ import {
 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { ServiceCategory } from "@/types/fixmate";
-
+import { usePathname } from "next/navigation";
+ 
 interface QuickLink {
   label: string;
   href: string;
@@ -73,8 +74,13 @@ function LinkedInIcon({ className }: { className?: string }) {
   );
 }
 
+
 export function Footer() {
   const currentYear = new Date().getFullYear();
+
+   const pathname = usePathname()
+
+     if (pathname.startsWith("/dashboard")) return null
 
   return (
     <footer className="relative overflow-hidden border-t border-slate-200/80 bg-white/85 backdrop-blur-md transition-colors duration-300 dark:border-slate-800/80 dark:bg-slate-950/90">
