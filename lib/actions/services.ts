@@ -15,7 +15,7 @@ const BASE_URL =
   >
 >;
 
-export const createService = (data: CreateServicePayload) =>
+export const createService = async (data: CreateServicePayload) =>
   protectedMutation(`${BASE_URL}/services`, "POST", data);
 
 
@@ -23,30 +23,30 @@ export const createService = (data: CreateServicePayload) =>
 
 // getTechnicianServices 
 
-export const getTechnicianServices = (email: string) =>
+export const getTechnicianServices = async (email: string) =>
   protectedQuery<RepairService[]>(
     `${BASE_URL}/services?technicianEmail=${encodeURIComponent(email)}`
   );
 
 // updateTechnician Services
 
-export const updateService = (id: string, data: UpdateServicePayload) =>
+export const updateService = async (id: string, data: UpdateServicePayload) =>
   protectedMutation(`${BASE_URL}/services/${id}`, "PATCH", data);
 
 //. deletetechnicianServices 
 
-export const deleteService = (id: string) =>
+export const deleteService = async (id: string) =>
   protectedMutation(`${BASE_URL}/services/${id}`, "DELETE");
 
 
 // making customer bookings  api 
 
-export const customerBookingService = (data: Booking) =>
+export const customerBookingService = async(data: Booking) =>
   protectedMutation(`${BASE_URL}/bookings`, "POST", data);
 
 //cancel booking by customer 
 
-export const cancelCustomerBooking = (id: string) =>
+export const cancelCustomerBooking = async (id: string) =>
   protectedMutation(`${BASE_URL}/bookings/${id}`, "PATCH", { status: "cancelled" });
 
 
@@ -59,8 +59,8 @@ export type ProfileUpdatePayload = {
   bio?: string;
 };
 
-export const getUserProfile = (email: string) =>
+export const getUserProfile = async (email: string) =>
   protectedQuery<User | null>(`${BASE_URL}/user/${encodeURIComponent(email)}`);
 
-export const profileUpdate = (email: string, data: ProfileUpdatePayload) =>
+export const profileUpdate = async (email: string, data: ProfileUpdatePayload) =>
   protectedMutation(`${BASE_URL}/user/${encodeURIComponent(email)}`, "PATCH", data);

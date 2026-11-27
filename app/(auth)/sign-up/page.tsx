@@ -12,6 +12,7 @@ import {
   X,
   Loader2,
   ShieldCheck,
+  Upload,
 } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -55,12 +56,61 @@ export default function SignUpPage({
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<FormErrors>({})
-  const [image, setImage] = useState("")
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+
   // Live password rule checks
   const hasMinLength = password.length >= 6
   const hasUppercase = /[A-Z]/.test(password)
   const hasLowercase = /[a-z]/.test(password)
   const isPasswordValid = hasMinLength && hasUppercase && hasLowercase
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please select a valid image file.")
+      return
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image must be smaller than 5MB.")
+      return
+    }
+
+    if (imagePreview) URL.revokeObjectURL(imagePreview)
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
+  }
+
+  const handleRemoveImage = () => {
+    if (imagePreview) URL.revokeObjectURL(imagePreview)
+    setImageFile(null)
+    setImagePreview(null)
+  }
+
+  const uploadToImgBB = async (file: File): Promise<string> => {
+    const apiKey = process.env.NEXT_PUBLIC_IMGBB_API_KEY
+    if (!apiKey) {
+      throw new Error("ImgBB API key is missing in .env.local.")
+    }
+
+    const formData = new FormData()
+    formData.append("image", file)
+
+    const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+      method: "POST",
+      body: formData,
+    })
+
+    const data = await res.json().catch(() => ({}))
+    if (!res.ok || !data?.success) {
+      throw new Error(data?.error?.message || "Failed to upload profile image.")
+    }
+
+    return data.data.display_url || data.data.url
+  }
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {}
@@ -93,13 +143,19 @@ export default function SignUpPage({
 
     setIsLoading(true)
     try {
-      const { data, error } = await authClient.signUp.email({
-        name: name.trim(),
-        email: email.trim(),
-        password,
-        image: image.trim() || undefined,
-        role,
-      })
+      let uploadedImageUrl: string | undefined
+
+      if (imageFile) {
+        uploadedImageUrl = await uploadToImgBB(imageFile)
+      }
+
+    const { data, error } = await authClient.signUp.email({
+  name: name.trim(),
+  email: email.trim(),
+  password,
+  image: uploadedImageUrl,
+  signupRole: role,
+})
 
       if (error) {
         toast.error(error.message || "Failed to create account.")
@@ -109,11 +165,15 @@ export default function SignUpPage({
       console.log("Created user:", data)
       toast.success("Account created successfully! Welcome to FixMate.")
       router.push(
-        '/'
+        "/"
         // role === "technician" ? "/dashboard/technician" : "/dashboard/customer"
       )
-    } catch {
-      toast.error("Something went wrong. Please try again.")
+    } catch (err) {
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again."
+      )
     } finally {
       setIsLoading(false)
     }
@@ -365,24 +425,63 @@ export default function SignUpPage({
                   )}
                 </Field>
 
-                {/* Profile Image URL (Optional) */}
+                {/* Profile Photo Upload (Optional) */}
                 <Field>
                   <FieldLabel
                     htmlFor="image"
                     className="text-sm font-medium text-slate-700"
                   >
-                    Profile Image URL{" "}
+                    Profile Photo{" "}
                     <span className="text-slate-400">(Optional)</span>
                   </FieldLabel>
-                  <Input
-                    id="image"
-                    name="image"
-                    type="url"
-                    placeholder="https://example.com/avatar.jpg"
-                    value={image}
-                    onChange={(e) => setImage(e.target.value)}
-                    className="h-11 rounded-xl border-slate-200/90 bg-white/90 text-slate-900 transition-all placeholder:text-slate-400 focus-visible:border-indigo-500 focus-visible:ring-4 focus-visible:ring-indigo-500/10"
-                  />
+
+                  <div className="flex items-center gap-3 rounded-2xl border border-dashed border-slate-200/90 bg-white/80 p-3">
+                    {imagePreview ? (
+                      <img
+                        src={imagePreview}
+                        alt="Profile preview"
+                        className="h-12 w-12 shrink-0 rounded-full border border-indigo-200 object-cover"
+                      />
+                    ) : (
+                      <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-indigo-50 text-indigo-600">
+                        <Upload className="h-5 w-5" />
+                      </div>
+                    )}
+
+                    <div className="min-w-0 flex-1">
+                      <label
+                        htmlFor="image"
+                        className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg bg-slate-100 px-3 py-1.5 text-xs font-semibold text-slate-700 transition-colors hover:bg-indigo-50 hover:text-indigo-700"
+                      >
+                        <Upload className="h-3.5 w-3.5" />
+                        {imageFile ? "Change Photo" : "Choose Image"}
+                      </label>
+                      <input
+                        id="image"
+                        name="image"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="hidden"
+                      />
+                      <p className="mt-1 truncate text-[11px] text-slate-400">
+                        {imageFile
+                          ? imageFile.name
+                          : "PNG, JPG, or WEBP up to 5MB"}
+                      </p>
+                    </div>
+
+                    {imageFile && (
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        aria-label="Remove selected image"
+                        className="rounded-lg p-1.5 text-slate-400 transition-colors hover:bg-red-50 hover:text-red-500"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    )}
+                  </div>
                 </Field>
 
                 {/* Password */}

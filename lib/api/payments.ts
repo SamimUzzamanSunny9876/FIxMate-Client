@@ -1,3 +1,5 @@
+'use server'
+
 import { Payment } from "@/types/fixmate";
 import { toast } from "sonner";
 import { protectedMutation, protectedQuery } from "../core/server";
