@@ -2,7 +2,7 @@
 
 import React, { useState } from "react"
 import Link from "next/link"
-import { useRouter, useSearchParams } from "next/navigation"
+import { redirect, useRouter, useSearchParams } from "next/navigation"
 import { Wrench, Eye, EyeOff, Loader2, ShieldCheck } from "lucide-react"
 import { toast } from "sonner"
 import { cn } from "@/lib/utils"
@@ -114,12 +114,12 @@ export default function SignInPage({
   const handleGoogleSignIn = async () => {
     setIsLoading(true)
     try {
-      // Replace with your BetterAuth Google social call:
-      // await authClient.signIn.social({
-      //   provider: "google",
-      //   callbackURL: safeCallbackUrl || "/dashboard/customer",
-      // });
+      const data = await authClient.signIn.social({
+        provider: "google",
+      })
+        console.log(data);
       toast.success("Redirecting to Google...")
+      router.push('/dashboard/customer')
     } catch {
       toast.error("Google sign in failed. Please try again.")
       setIsLoading(false)

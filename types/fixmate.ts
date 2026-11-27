@@ -55,16 +55,19 @@ export interface RepairService {
   title: string;
   category: ServiceCategory;
   description: string;
-  image: string;
   basePrice: number;
   estimatedDuration: string;
   serviceMode: ServiceMode;
   serviceArea: string;
-  technicianName: string;
+  image: string;
   technicianEmail: string;
+  technicianName: string;
   approvalStatus: ApprovalStatus;
   isAvailable: boolean;
-  createdAt: string | Date;
+  averageRating?: number;
+  reviewCount?: number;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export type CreateServicePayload = Omit<RepairService, "_id" | "createdAt">;
@@ -83,23 +86,24 @@ export interface Booking {
   serviceId: string;
   serviceTitle: string;
   serviceImage: string;
-  category: ServiceCategory;
+  category: string;
+  serviceMode: ServiceMode;
   basePrice: number;
-  technicianName: string;
+  finalAmount?: number;
   technicianEmail: string;
-  customerName: string;
+  technicianName: string;
   customerEmail: string;
-  customerPhone: string;
+  customerName: string;
+  scheduledDate: string;
   address: string;
-  preferredDate: string | Date;
-  problemDescription: string;
+  issueNotes: string;
   status: BookingStatus;
-  finalAmount: number;
-  paymentStatus: PaymentStatus;
-  statusHistory?: StatusHistoryEntry[];
+  paymentStatus: "unpaid" | "paid";
+  paidAt?: string;
   rating?: number;
   review?: string;
-  createdAt?: string | Date;
+  reviewedAt?: string;
+  createdAt?: string;
 }
 
 // ==========================================

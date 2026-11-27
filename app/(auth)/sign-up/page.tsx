@@ -2,7 +2,7 @@
 
 import React, { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { redirect, useRouter } from "next/navigation"
 import {
   Wrench,
   User as UserIcon,
@@ -182,16 +182,17 @@ export default function SignUpPage({
   const handleGoogleSignUp = async () => {
     setIsLoading(true)
     try {
-      // Replace with your BetterAuth Google social call:
-      // await authClient.signIn.social({
-      //   provider: "google",
-      //   callbackURL: "/dashboard/customer",
-      // });
+      const data = await authClient.signIn.social({
+        provider: "google",
+      })
+      console.log(data);
       toast.success("Redirecting to Google...")
+      router.push('/dashboard/customer')
     } catch {
       toast.error("Google sign up failed. Please try again.")
       setIsLoading(false)
     }
+  
   }
 
   return (
