@@ -16,12 +16,13 @@ import {
   Check,
   DollarSign,
   Wrench,
+  Download,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
 import { Booking, Payment } from "@/types/fixmate";
-
+import { downloadPaymentInvoice } from "@/lib/utils/downloadInvoice";
 import {
   getCustomerPayments,
   createCheckoutSession,
@@ -158,6 +159,15 @@ const PaymentPage = () => {
     setCopiedId(txnId);
     toast.success("Transaction ID copied!");
     setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const handleDownloadInvoice = (payment: Payment) => {
+    try {
+      downloadPaymentInvoice(payment);
+      toast.success("Invoice PDF downloaded!");
+    } catch {
+      toast.error("Failed to generate invoice PDF.");
+    }
   };
 
   const totalSpent = payments.reduce((sum, p) => sum + Number(p.amount || 0), 0);
@@ -441,16 +451,28 @@ const PaymentPage = () => {
                         </Badge>
                       </TableCell>
                       <TableCell className="pr-6 text-right">
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => setSelectedReceipt(payment)}
-                          className="h-8 rounded-full px-3 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/50"
-                        >
-                          <Receipt className="mr-1.5 h-3.5 w-3.5" />
-                          View
-                        </Button>
+                        <div className="inline-flex items-center gap-1.5">
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => setSelectedReceipt(payment)}
+                            className="h-8 rounded-full px-3 text-xs font-semibold text-indigo-600 hover:bg-indigo-50 dark:text-indigo-400 dark:hover:bg-indigo-950/50"
+                          >
+                            <Receipt className="mr-1.5 h-3.5 w-3.5" />
+                            View
+                          </Button>
+                          <Button
+                            type="button"
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDownloadInvoice(payment)}
+                            className="h-8 rounded-full border-slate-200 px-3 text-xs font-semibold text-slate-700 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-600 dark:border-slate-800 dark:text-slate-200 dark:hover:border-indigo-700 dark:hover:bg-indigo-950/50 dark:hover:text-indigo-400"
+                          >
+                            <Download className="mr-1.5 h-3.5 w-3.5" />
+                            PDF
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -481,16 +503,28 @@ const PaymentPage = () => {
 
                   <div className="mt-3 flex items-center justify-between border-t border-slate-100 pt-3 text-xs text-slate-500 dark:border-slate-800">
                     <span>{formatDate(payment.paidAt)}</span>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setSelectedReceipt(payment)}
-                      className="h-7 rounded-full px-3 text-xs text-indigo-600"
-                    >
-                      <Receipt className="mr-1 h-3.5 w-3.5" />
-                      Receipt
-                    </Button>
+                    <div className="flex items-center gap-1.5">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => setSelectedReceipt(payment)}
+                        className="h-7 rounded-full px-3 text-xs text-indigo-600"
+                      >
+                        <Receipt className="mr-1 h-3.5 w-3.5" />
+                        Receipt
+                      </Button>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDownloadInvoice(payment)}
+                        className="h-7 rounded-full px-3 text-xs"
+                      >
+                        <Download className="mr-1 h-3.5 w-3.5" />
+                        PDF
+                      </Button>
+                    </div>
                   </div>
                 </Card>
               ))}
@@ -573,6 +607,15 @@ const PaymentPage = () => {
                   </button>
                 </div>
               </div>
+
+              <Button
+                type="button"
+                onClick={() => handleDownloadInvoice(selectedReceipt)}
+                className="mt-1 h-10 w-full rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 text-xs font-semibold text-white shadow-md shadow-indigo-500/25 transition-all hover:shadow-lg hover:shadow-indigo-500/40"
+              >
+                <Download className="mr-2 h-4 w-4" />
+                Download PDF Invoice
+              </Button>
             </>
           )}
         </DialogContent>
