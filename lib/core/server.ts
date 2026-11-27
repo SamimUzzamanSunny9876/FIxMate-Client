@@ -6,13 +6,15 @@ import { headers } from "next/headers"
 import { redirect } from "next/navigation";
 
 export const getSession = async () => {
-    
-    const session = await auth.api.getSession({
-        headers: await headers()
-    })
-    return session 
-
-}
+  try {
+    return await auth.api.getSession({
+      headers: await headers(),
+    });
+  } catch (err) {
+    console.error("getSession error:", err);
+    return null;
+  }
+};
 
 export const getToken = async () =>{
     const session = await getSession()

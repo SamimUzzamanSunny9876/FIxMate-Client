@@ -1,21 +1,52 @@
 import { betterAuth } from "better-auth";
-import { MongoClient } from "mongodb";
+import { Db, MongoClient } from "mongodb";
 import { mongodbAdapter } from "@better-auth/mongo-adapter";
 import { admin } from "better-auth/plugins";
 
+const uri = process.env.BETTER_AUTH_DB_URI as string;
+
 const globalForMongo = globalThis as unknown as {
   betterAuthMongoClient?: MongoClient;
+  betterAuthDbPromise?: Promise<Db>;
 };
 
 const client =
   globalForMongo.betterAuthMongoClient ??
-  new MongoClient(process.env.BETTER_AUTH_DB_URI as string);
+  new MongoClient(uri, {
+    maxPoolSize: 10,
+    serverSelectionTimeoutMS: 10000,
+    socketTimeoutMS: 45000,
+  });
 
-if (process.env.NODE_ENV !== "production") {
-  globalForMongo.betterAuthMongoClient = client;
+globalForMongo.betterAuthMongoClient = client;
+
+async function getConnectedDb(): Promise<Db> {
+  if (!globalForMongo.betterAuthDbPromise) {
+    globalForMongo.betterAuthDbPromise = client
+      .connect()
+      .then((connected) => connected.db("FixMatedb"))
+      .catch((err) => {
+        globalForMongo.betterAuthDbPromise = undefined;
+        throw err;
+      });
+  }
+
+  try {
+    await client.db("admin").command({ ping: 1 });
+    return await globalForMongo.betterAuthDbPromise;
+  } catch {
+    globalForMongo.betterAuthDbPromise = client
+      .connect()
+      .then((connected) => connected.db("FixMatedb"))
+      .catch((err) => {
+        globalForMongo.betterAuthDbPromise = undefined;
+        throw err;
+      });
+    return await globalForMongo.betterAuthDbPromise;
+  }
 }
 
-const db = client.db("FixMatedb");
+const db = await getConnectedDb();
 
 export const auth = betterAuth({
   baseURL: process.env.BETTER_AUTH_URL,
