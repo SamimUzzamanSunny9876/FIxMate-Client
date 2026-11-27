@@ -17,6 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 import { getBrowseServices } from "@/lib/api/services";
 import { RepairService, ServiceCategory, ServiceMode } from "@/types/fixmate";
+import { ServiceRatingBadge } from "@/app/components/ServiceRatingBadge";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -185,9 +186,7 @@ const BrowserServicesPage = async ({
             <span className="font-bold text-slate-900 dark:text-white">
               {services.length}
             </span>{" "}
-            {services.length === 1
-              ? "verified service"
-              : "verified services"}
+            {services.length === 1 ? "verified service" : "verified services"}
           </p>
 
           {hasActiveFilters && (
@@ -264,7 +263,7 @@ const BrowserServicesPage = async ({
                   alt={service.title}
                   className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
                 />
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/50 via-transparent to-transparent" />
+                <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-slate-950/55 via-transparent to-transparent" />
 
                 {/* Category Badge */}
                 <Badge className="absolute top-3 left-3 rounded-full bg-white/90 text-xs font-semibold text-slate-800 shadow-xs backdrop-blur-md hover:bg-white dark:bg-slate-900/90 dark:text-slate-100">
@@ -280,6 +279,13 @@ const BrowserServicesPage = async ({
                   )}
                   {service.serviceMode}
                 </Badge>
+
+                {/* Average Rating Badge */}
+                <ServiceRatingBadge
+                  averageRating={service.averageRating}
+                  reviewCount={service.reviewCount}
+                  className="absolute bottom-3 left-3 shadow-xs backdrop-blur-md"
+                />
               </div>
 
               {/* Card Body (equal height across grid) */}

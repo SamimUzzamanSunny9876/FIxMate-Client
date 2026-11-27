@@ -38,6 +38,32 @@ export const getServiceDetails = async ({ id }: { id: string }) => {
   }
 };
 
+// --- Rating --- 
+export const submitBookingReview = async ({
+  bookingId,
+  rating,
+  review,
+  customerEmail,
+}: {
+  bookingId: string;
+  rating: number;
+  review: string;
+  customerEmail?: string;
+}) => {
+  const res = await fetch(`${BASE_URL}/bookings/${bookingId}/review`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ rating, review, customerEmail }),
+  });
+
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) {
+    throw new Error(data?.message || "Failed to submit rating and review.");
+  }
+
+  return data;
+};
+
 // --- Protected Routes ---
 export const customerBookings = async (email: string): Promise<Booking[]> => {
   const result = await protectedQuery<Booking[] | { data?: Booking[] }>(

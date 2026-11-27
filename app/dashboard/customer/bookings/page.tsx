@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { createCheckoutSession, handlePayNow } from "@/lib/api/payments";
+import { handlePayNow } from "@/lib/api/payments";
 import Link from "next/link";
 import {
   Calendar,
@@ -18,12 +18,13 @@ import {
   User,
   Search,
   ClipboardList,
+  Star,
 } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { authClient } from "@/lib/auth-client";
 import { Booking, BookingStatus } from "@/types/fixmate";
-
+import { BookingReviewModal } from "@/app/components/BookingReviewModal";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -140,7 +141,7 @@ const CustomerBookingPage = () => {
     };
 
     void loadBookings();
-  
+
     return () => {
       isMounted = false;
     };
@@ -171,6 +172,21 @@ const CustomerBookingPage = () => {
     }
   };
 
+  const handleReviewSaved = (
+    bookingId: string | undefined,
+    updated: Partial<Booking>
+  ) => {
+    if (!bookingId) return;
+    setBookings((prev) =>
+      prev.map((item) =>
+        item._id === bookingId ? { ...item, ...updated } : item
+      )
+    );
+    setSelectedBooking((prev) =>
+      prev && prev._id === bookingId ? { ...prev, ...updated } : prev
+    );
+  };
+
   // Summary counts
   const totalCount = bookings.length;
   const activeCount = bookings.filter((b) =>
@@ -196,8 +212,8 @@ const CustomerBookingPage = () => {
             My Bookings
           </h1>
           <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-            Track your repair requests, cancel pending orders, or pay once work
-            is completed.
+            Track your repair requests, cancel pending orders, or pay and review
+            once work is completed.
           </p>
         </div>
 
@@ -414,15 +430,23 @@ const CustomerBookingPage = () => {
                               <Button
                                 type="button"
                                 size="sm"
-                                onClick={() =>
-                                   handlePayNow(booking._id)
-                                }
+                                onClick={() => handlePayNow(booking._id)}
                                 className="h-8 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-3.5 text-xs font-semibold text-white shadow-sm"
                               >
                                 <CreditCard className="mr-1.5 h-3.5 w-3.5" />
                                 Pay Now
                               </Button>
                             )}
+
+                          {booking.paymentStatus === "paid" && (
+                            <BookingReviewModal
+                              booking={booking}
+                              customerEmail={customerEmail}
+                              onReviewSaved={(updated) =>
+                                handleReviewSaved(booking._id, updated)
+                              }
+                            />
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
@@ -519,17 +543,22 @@ const CustomerBookingPage = () => {
                             <Button
                               type="button"
                               size="sm"
-                              onClick={() =>
-                                toast.info(
-                                  "Stripe payment checkout coming next!"
-                                )
-                              }
+                              onClick={() => handlePayNow(booking._id)}
                               className="h-8 rounded-full bg-gradient-to-r from-indigo-600 to-violet-600 px-3.5 text-xs text-white"
                             >
                               <CreditCard className="mr-1 h-3.5 w-3.5" />
                               Pay Now
                             </Button>
                           )}
+                        {booking.paymentStatus === "paid" && (
+                          <BookingReviewModal
+                            booking={booking}
+                            customerEmail={customerEmail}
+                            onReviewSaved={(updated) =>
+                              handleReviewSaved(booking._id, updated)
+                            }
+                          />
+                        )}
                       </div>
                     </div>
                   </CardContent>
@@ -599,6 +628,45 @@ const CustomerBookingPage = () => {
                     {selectedBooking.problemDescription}
                   </p>
                 </div>
+
+                {/* Saved Rating & Review Preview (if rated) */}
+                {selectedBooking.rating && selectedBooking.review && (
+                  <div className="rounded-2xl border border-amber-200/70 bg-amber-50/60 p-4 dark:border-amber-900/50 dark:bg-amber-950/30">
+                    <div className="flex items-center justify-between">
+                      <p className="text-xs font-semibold text-amber-800 uppercase dark:text-amber-300">
+                        Your Review
+                      </p>
+                      <div className="flex items-center gap-0.5">
+                        {[1, 2, 3, 4, 5].map((n) => (
+                          <Star
+                            key={n}
+                            className={cn(
+                              "h-3.5 w-3.5",
+                              n <= (selectedBooking.rating ?? 0)
+                                ? "fill-amber-400 text-amber-400"
+                                : "text-slate-300 dark:text-slate-600"
+                            )}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                    <p className="mt-2 text-sm text-slate-700 dark:text-slate-300">
+                      {selectedBooking.review}
+                    </p>
+                  </div>
+                )}
+
+                {selectedBooking.paymentStatus === "paid" && (
+                  <div className="flex justify-end pt-1">
+                    <BookingReviewModal
+                      booking={selectedBooking}
+                      customerEmail={customerEmail}
+                      onReviewSaved={(updated) =>
+                        handleReviewSaved(selectedBooking._id, updated)
+                      }
+                    />
+                  </div>
+                )}
               </div>
             </>
           )}

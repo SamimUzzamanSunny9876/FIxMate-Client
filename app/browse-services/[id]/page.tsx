@@ -13,33 +13,55 @@ import {
   Mail,
   Wrench,
   Sparkles,
+  Star,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { getServiceDetails } from "@/lib/api/services";
 import { RepairService } from "@/types/fixmate";
 
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { RequestRepairModal } from "@/app/components/RequestRepairModal";
+import { ServiceRatingBadge } from "@/app/components/ServiceRatingBadge";
+
+interface ServiceReviewItem {
+  _id: string;
+  customerName?: string;
+  rating: number;
+  review: string;
+  reviewedAt?: string;
+  paidAt?: string;
+}
 
 interface ServiceDetailsResponse extends RepairService {
   technicianImage?: string;
   technicianArea?: string;
   technicianBio?: string;
+  reviews?: ServiceReviewItem[];
 }
+
+const formatReviewDate = (date?: string) => {
+  if (!date) return "";
+  const d = new Date(date);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+  });
+};
 
 const ServiceDetailsPage = async ({
   params,
 }: {
   params: Promise<{ id: string }>;
 }) => {
- 
   const { id } = await params;
   const details: ServiceDetailsResponse | null = await getServiceDetails({
     id,
   });
 
   // Show 404 if service does not exist or is not approved/available
-  
   if (
     !details ||
     !details._id ||
@@ -57,7 +79,6 @@ const ServiceDetailsPage = async ({
     .slice(0, 2);
 
   return (
-    
     <section className="relative mx-auto min-h-[85vh] w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Subtle Background Glow */}
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 mx-auto h-80 max-w-4xl rounded-full bg-indigo-500/10 blur-3xl dark:bg-indigo-500/15" />
@@ -75,7 +96,7 @@ const ServiceDetailsPage = async ({
 
       {/* Main 2-Column Responsive Layout */}
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:items-start">
-        {/* Left Column: Hero Image, Details & Technician Summary */}
+        {/* Left Column: Hero Image, Details, Technician & Reviews */}
         <div className="space-y-6 lg:col-span-8">
           {/* Large Hero Image Card */}
           <div className="group relative overflow-hidden rounded-3xl border border-slate-200/80 bg-slate-100 shadow-lg animate-in fade-in slide-in-from-bottom-4 duration-500 dark:border-slate-800 dark:bg-slate-900">
@@ -99,6 +120,11 @@ const ServiceDetailsPage = async ({
                 )}
                 {details.serviceMode}
               </Badge>
+              <ServiceRatingBadge
+                averageRating={details.averageRating}
+                reviewCount={details.reviewCount}
+                className="shadow-sm backdrop-blur-md"
+              />
             </div>
 
             {/* Bottom Title Overlay on Desktop/Tablet */}
@@ -232,10 +258,75 @@ const ServiceDetailsPage = async ({
               </div>
             </CardContent>
           </Card>
+
+          {/* Customer Reviews Card */}
+          <Card className="rounded-3xl border border-slate-200/80 bg-white/90 shadow-sm animate-in fade-in slide-in-from-bottom-4 duration-500 delay-200 dark:border-slate-800 dark:bg-slate-950/80">
+            <CardContent className="space-y-4 p-6 sm:p-7">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+                  Customer Reviews
+                </h2>
+                <ServiceRatingBadge
+                  averageRating={details.averageRating}
+                  reviewCount={details.reviewCount}
+                />
+              </div>
+
+              {!details.reviews || details.reviews.length === 0 ? (
+                <p className="rounded-2xl border border-dashed border-slate-200 bg-slate-50/60 p-5 text-center text-sm text-slate-500 dark:border-slate-800 dark:bg-slate-900/40 dark:text-slate-400">
+                  No reviews yet. Customers can leave a rating and review after
+                  their repair is completed and paid.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {details.reviews.map((item) => {
+                    const reviewDate = formatReviewDate(
+                      item.reviewedAt || item.paidAt
+                    );
+                    return (
+                      <div
+                        key={item._id}
+                        className="rounded-2xl border border-slate-100 bg-slate-50/70 p-4 transition-colors hover:border-indigo-100 dark:border-slate-800/80 dark:bg-slate-900/60 dark:hover:border-indigo-900/60"
+                      >
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div>
+                            <span className="text-sm font-bold text-slate-900 dark:text-white">
+                              {item.customerName || "Verified Customer"}
+                            </span>
+                            {reviewDate && (
+                              <span className="ml-2 text-xs text-slate-400 dark:text-slate-500">
+                                {reviewDate}
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-0.5">
+                            {[1, 2, 3, 4, 5].map((n) => (
+                              <Star
+                                key={n}
+                                className={cn(
+                                  "h-3.5 w-3.5",
+                                  n <= item.rating
+                                    ? "fill-amber-400 text-amber-400"
+                                    : "text-slate-300 dark:text-slate-600"
+                                )}
+                              />
+                            ))}
+                          </div>
+                        </div>
+                        <p className="mt-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                          {item.review}
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
 
         {/* Right Column: Sticky Booking & Trust Card */}
-        <div className="lg:col-span-4 lg:sticky lg:top-24 space-y-4 animate-in fade-in slide-in-from-bottom-5 duration-700 delay-150">
+        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-5 duration-700 delay-150 lg:sticky lg:top-24 lg:col-span-4">
           <Card className="overflow-hidden rounded-3xl border border-slate-200/80 bg-white/95 shadow-[0_20px_50px_-20px_rgba(79,70,229,0.2)] backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/90">
             <div className="border-b border-slate-100 bg-gradient-to-r from-indigo-50/80 to-violet-50/80 px-6 py-5 dark:border-slate-800 dark:from-indigo-950/40 dark:to-violet-950/40">
               <div className="flex items-center justify-between">
@@ -247,13 +338,19 @@ const ServiceDetailsPage = async ({
                   Pay After Service
                 </span>
               </div>
-              <div className="mt-2 flex items-baseline gap-1.5">
-                <span className="text-4xl font-extrabold tracking-tight text-indigo-600 dark:text-indigo-400">
-                  ${details.basePrice}
-                </span>
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                  USD base estimate
-                </span>
+              <div className="mt-2 flex items-baseline justify-between gap-2">
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-4xl font-extrabold tracking-tight text-indigo-600 dark:text-indigo-400">
+                    ${details.basePrice}
+                  </span>
+                  <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
+                    USD base estimate
+                  </span>
+                </div>
+                <ServiceRatingBadge
+                  averageRating={details.averageRating}
+                  reviewCount={details.reviewCount}
+                />
               </div>
             </div>
 

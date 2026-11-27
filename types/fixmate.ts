@@ -87,23 +87,24 @@ export interface Booking {
   serviceTitle: string;
   serviceImage: string;
   category: string;
-  serviceMode: ServiceMode;
+  serviceMode?: ServiceMode;
   basePrice: number;
   finalAmount?: number;
   technicianEmail: string;
   technicianName: string;
   customerEmail: string;
   customerName: string;
-  scheduledDate: string;
+  customerPhone: string;
+  preferredDate: string | Date;
   address: string;
-  issueNotes: string;
+  problemDescription: string;
   status: BookingStatus;
   paymentStatus: "unpaid" | "paid";
-  paidAt?: string;
+  paidAt?: string | Date;
   rating?: number;
   review?: string;
-  reviewedAt?: string;
-  createdAt?: string;
+  reviewedAt?: string | Date;
+  createdAt?: string | Date;
 }
 
 // ==========================================
