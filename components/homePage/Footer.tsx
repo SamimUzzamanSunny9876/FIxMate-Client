@@ -77,17 +77,17 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="relative overflow-hidden border-t border-slate-200/80 bg-white/85 backdrop-blur-md">
+    <footer className="relative overflow-hidden border-t border-slate-200/80 bg-white/85 backdrop-blur-md transition-colors duration-300 dark:border-slate-800/80 dark:bg-slate-950/90">
       {/* Subtle Ambient Top Glow */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-40 bg-gradient-to-b from-indigo-50/60 via-sky-50/30 to-transparent"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-40 bg-gradient-to-b from-indigo-50/60 via-sky-50/30 to-transparent dark:from-indigo-950/40 dark:via-slate-900/20 dark:to-transparent"
       />
 
       <div className="mx-auto max-w-6xl px-4 pt-14 pb-8 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2 lg:grid-cols-12 lg:gap-8">
           {/* Column 1: Brand, Tagline & Socials */}
-          <div className="lg:col-span-4 space-y-4">
+          <div className="space-y-4 lg:col-span-4">
             <Link
               href="/"
               className="group inline-flex items-center gap-2.5 focus:outline-none"
@@ -95,20 +95,20 @@ export function Footer() {
               <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 text-white shadow-md shadow-indigo-500/25 transition-transform duration-300 group-hover:scale-105 group-hover:-rotate-6">
                 <Wrench className="h-4 w-4 stroke-[2.5]" />
               </div>
-              <span className="text-xl font-bold tracking-tight text-slate-900">
+              <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
                 FixMate
               </span>
             </Link>
 
-            <p className="max-w-sm text-sm leading-relaxed text-slate-500">
+            <p className="max-w-sm text-sm leading-relaxed text-slate-500 dark:text-slate-400">
               Trusted on-demand smart device and home appliance repair
               platform. Track every step in real time and pay online only after
               your repair is completed.
             </p>
 
             {/* Trust Badge */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200/70 bg-emerald-50/80 px-3 py-1 text-xs font-medium text-emerald-700">
-              <ShieldCheck className="h-3.5 w-3.5 text-emerald-600" />
+            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200/70 bg-emerald-50/80 px-3 py-1 text-xs font-medium text-emerald-700 dark:border-emerald-800/60 dark:bg-emerald-950/50 dark:text-emerald-300">
+              <ShieldCheck className="h-3.5 w-3.5 text-emerald-600 dark:text-emerald-400" />
               <span>Pay Only After Completion</span>
             </div>
 
@@ -119,7 +119,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Follow FixMate on X"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 bg-white text-slate-600 shadow-2xs transition-all duration-300 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-600 hover:text-white hover:shadow-md hover:shadow-indigo-500/20"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 bg-white text-slate-600 shadow-2xs transition-all duration-300 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-600 hover:text-white hover:shadow-md hover:shadow-indigo-500/20 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-indigo-500 dark:hover:bg-indigo-600 dark:hover:text-white"
               >
                 <XLogoIcon className="h-4 w-4" />
               </Link>
@@ -128,7 +128,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Follow FixMate on Facebook"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 bg-white text-slate-600 shadow-2xs transition-all duration-300 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-600 hover:text-white hover:shadow-md hover:shadow-indigo-500/20"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 bg-white text-slate-600 shadow-2xs transition-all duration-300 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-600 hover:text-white hover:shadow-md hover:shadow-indigo-500/20 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-indigo-500 dark:hover:bg-indigo-600 dark:hover:text-white"
               >
                 <FacebookIcon className="h-4 w-4" />
               </Link>
@@ -137,7 +137,7 @@ export function Footer() {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Connect with FixMate on LinkedIn"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 bg-white text-slate-600 shadow-2xs transition-all duration-300 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-600 hover:text-white hover:shadow-md hover:shadow-indigo-500/20"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200/80 bg-white text-slate-600 shadow-2xs transition-all duration-300 hover:-translate-y-0.5 hover:border-indigo-300 hover:bg-indigo-600 hover:text-white hover:shadow-md hover:shadow-indigo-500/20 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-indigo-500 dark:hover:bg-indigo-600 dark:hover:text-white"
               >
                 <LinkedInIcon className="h-4 w-4" />
               </Link>
@@ -146,7 +146,7 @@ export function Footer() {
 
           {/* Column 2: Quick Links */}
           <div className="lg:col-span-2">
-            <h3 className="text-sm font-bold tracking-wider text-slate-900 uppercase">
+            <h3 className="text-sm font-bold tracking-wider text-slate-900 uppercase dark:text-white">
               Quick Links
             </h3>
             <ul className="mt-4 space-y-2.5">
@@ -154,10 +154,10 @@ export function Footer() {
                 <li key={link.label}>
                   <Link
                     href={link.href}
-                    className="group inline-flex items-center gap-1 text-sm text-slate-500 transition-colors duration-200 hover:text-indigo-600"
+                    className="group inline-flex items-center gap-1 text-sm text-slate-500 transition-colors duration-200 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
                   >
                     <span>{link.label}</span>
-                    <ArrowUpRight className="h-3.5 w-3.5 opacity-0 -translate-x-1 transition-all duration-200 group-hover:opacity-100 group-hover:translate-x-0" />
+                    <ArrowUpRight className="h-3.5 w-3.5 -translate-x-1 opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100" />
                   </Link>
                 </li>
               ))}
@@ -166,7 +166,7 @@ export function Footer() {
 
           {/* Column 3: Popular Categories */}
           <div className="lg:col-span-3">
-            <h3 className="text-sm font-bold tracking-wider text-slate-900 uppercase">
+            <h3 className="text-sm font-bold tracking-wider text-slate-900 uppercase dark:text-white">
               Popular Categories
             </h3>
             <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2.5 sm:grid-cols-1">
@@ -174,9 +174,9 @@ export function Footer() {
                 <li key={category}>
                   <Link
                     href={`/browse-services?category=${encodeURIComponent(category)}`}
-                    className="group inline-flex items-center gap-1.5 text-sm text-slate-500 transition-colors duration-200 hover:text-indigo-600"
+                    className="group inline-flex items-center gap-1.5 text-sm text-slate-500 transition-colors duration-200 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
                   >
-                    <span className="h-1.5 w-1.5 rounded-full bg-slate-300 transition-colors duration-200 group-hover:bg-indigo-600" />
+                    <span className="h-1.5 w-1.5 rounded-full bg-slate-300 transition-colors duration-200 group-hover:bg-indigo-600 dark:bg-slate-700 dark:group-hover:bg-indigo-400" />
                     <span>{category}</span>
                   </Link>
                 </li>
@@ -186,34 +186,34 @@ export function Footer() {
 
           {/* Column 4: Contact Info */}
           <div className="lg:col-span-3">
-            <h3 className="text-sm font-bold tracking-wider text-slate-900 uppercase">
+            <h3 className="text-sm font-bold tracking-wider text-slate-900 uppercase dark:text-white">
               Contact Us
             </h3>
-            <ul className="mt-4 space-y-3.5 text-sm text-slate-500">
+            <ul className="mt-4 space-y-3.5 text-sm text-slate-500 dark:text-slate-400">
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400">
                   <MapPin className="h-4 w-4" />
                 </span>
                 <span>House 24, Road 7, Dhanmondi, Dhaka 1205, Bangladesh</span>
               </li>
               <li className="flex items-center gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400">
                   <Phone className="h-4 w-4" />
                 </span>
                 <a
-                  href="tel:+8801700000000"
-                  className="transition-colors hover:text-indigo-600"
+                  href="tel:+8801861805137"
+                  className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
                 >
                   +880 1861805137
                 </a>
               </li>
               <li className="flex items-center gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400">
                   <Mail className="h-4 w-4" />
                 </span>
                 <a
                   href="mailto:support@fixmate.com"
-                  className="transition-colors hover:text-indigo-600"
+                  className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
                 >
                   support@fixmate.com
                 </a>
@@ -222,21 +222,21 @@ export function Footer() {
           </div>
         </div>
 
-        <Separator className="my-8 bg-slate-200/70" />
+        <Separator className="my-8 bg-slate-200/70 dark:bg-slate-800" />
 
         {/* Bottom Copyright Bar */}
-        <div className="flex flex-col items-center justify-between gap-4 text-xs text-slate-500 sm:flex-row">
+        <div className="flex flex-col items-center justify-between gap-4 text-xs text-slate-500 sm:flex-row dark:text-slate-400">
           <p>© {currentYear} FixMate. All rights reserved.</p>
           <div className="flex items-center gap-6">
             <Link
               href="/about"
-              className="transition-colors hover:text-indigo-600"
+              className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
             >
               How It Works
             </Link>
             <Link
-              href="/services"
-              className="transition-colors hover:text-indigo-600"
+              href="/browse-services"
+              className="transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
             >
               Verified Technicians
             </Link>
