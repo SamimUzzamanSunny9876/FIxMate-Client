@@ -32,12 +32,14 @@ const ServiceDetailsPage = async ({
 }: {
   params: Promise<{ id: string }>;
 }) => {
+ 
   const { id } = await params;
   const details: ServiceDetailsResponse | null = await getServiceDetails({
     id,
   });
 
   // Show 404 if service does not exist or is not approved/available
+  
   if (
     !details ||
     !details._id ||
@@ -55,6 +57,7 @@ const ServiceDetailsPage = async ({
     .slice(0, 2);
 
   return (
+    
     <section className="relative mx-auto min-h-[85vh] w-full max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
       {/* Subtle Background Glow */}
       <div className="pointer-events-none absolute inset-x-0 top-0 -z-10 mx-auto h-80 max-w-4xl rounded-full bg-indigo-500/10 blur-3xl dark:bg-indigo-500/15" />

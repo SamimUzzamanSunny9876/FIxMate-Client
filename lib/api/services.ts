@@ -26,10 +26,16 @@ export const getBrowseServices = async ({
 };
 
 export const getServiceDetails = async ({ id }: { id: string }) => {
-  const res = await fetch(`${BASE_URL}/browse-services/${id}`, {
-    cache: "no-store",
-  });
-  return res.json();
+  try {
+    const res = await fetch(`${BASE_URL}/browse-services/${id}`, {
+      cache: "no-store",
+    });
+
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
 };
 
 // --- Protected Routes ---
